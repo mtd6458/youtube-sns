@@ -42,26 +42,26 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
-	var pl []migration.Post
-	db.Where("group_id > 0").Order("created_at desc").Limit(10).Find(&pl)
+	var postList []migration.Post
+	db.Where("group_id > 0").Order("created_at desc").Limit(10).Find(&postList)
 
-	var gl []migration.Group
-	db.Order("created_at desc").Limit(10).Find(&gl)
+	var groupList []migration.Group
+	db.Order("created_at desc").Limit(10).Find(&groupList)
 
 	item := struct {
-		Title 	string
-		Message string
-		Name 	string
-		Account string
-		Plist	[]migration.Post
-		Glist 	[]migration.Group
+		Title     string
+		Message   string
+		Name      string
+		Account   string
+		PostList  []migration.Post
+		GroupList []migration.Group
 	}{
-		Title: "Index",
-		Message: "This is Top page.",
-		Name: user.Name,
-		Account: user.Account,
-		Plist: pl,
-		Glist: gl,
+		Title:     "Index",
+		Message:   "This is Top page.",
+		Name:      user.Name,
+		Account:   user.Account,
+		PostList:  postList,
+		GroupList: groupList,
 	}
 	er := page("index").Execute(w, item)
 	if er != nil {
