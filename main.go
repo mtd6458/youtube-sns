@@ -30,8 +30,11 @@ func checkLogin() *migration.User {
 
 // get target Template.
 func page(fname string) *template.Template {
-	tmps, _ := template.ParseFiles("templates/"+fname+".html",
-		"templates/head.html", "templates/foot.html")
+	tmps, _ := template.ParseFiles(
+		"templates/"+fname+".html",
+		"templates/head.html",
+		"templates/foot.html",
+	)
 	return  tmps
 }
 
@@ -63,6 +66,7 @@ func index(w http.ResponseWriter, rq *http.Request) {
 		PostList:  postList,
 		GroupList: groupList,
 	}
+
 	er := page("index").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
@@ -71,7 +75,9 @@ func index(w http.ResponseWriter, rq *http.Request) {
 
 func main() {
 
-	// index handling
+	/**
+	 * routing
+	 */
 	http.HandleFunc("/", func(w http.ResponseWriter, rq *http.Request) {
 		index(w, rq)
 	})
