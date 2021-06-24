@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/youtube-sns/migration"
-	"log"
-	"net/http"
-	"text/template"
+  "github.com/jinzhu/gorm"
+  "github.com/youtube-sns/migration"
+  "html/template"
+  "log"
+  "net/http"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+  _ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // db variable.
