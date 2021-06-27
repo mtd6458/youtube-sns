@@ -16,3 +16,4 @@ main
 # vendor/
 .idea/workspace.xml
 .idea/
+data.sqlite3
