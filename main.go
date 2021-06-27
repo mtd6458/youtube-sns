@@ -14,6 +14,18 @@ import (
 var dbDriver = "sqlite3"
 var dbName   = "data.sqlite3"
 
+func main() {
+
+  /**
+   * routing
+   */
+  http.HandleFunc("/", func(w http.ResponseWriter, rq *http.Request) {
+    index(w, rq)
+  })
+
+  http.ListenAndServe(":8080", nil)
+}
+
 // login check
 func checkLogin() *migration.User {
 
@@ -71,16 +83,4 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	if er != nil {
 		log.Fatal(er)
 	}
-}
-
-func main() {
-
-	/**
-	 * routing
-	 */
-	http.HandleFunc("/", func(w http.ResponseWriter, rq *http.Request) {
-		index(w, rq)
-	})
-
-	http.ListenAndServe("", nil)
 }
