@@ -6,6 +6,7 @@ import (
   "html/template"
   "log"
   "net/http"
+  "strings"
 
   _ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -19,8 +20,12 @@ func main() {
   /**
    * routing
    */
-  http.HandleFunc("/", func(w http.ResponseWriter, rq *http.Request) {
-    index(w, rq)
+  http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+    index(writer, request)
+  })
+
+  http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
+    home(writer, request)
   })
 
   http.ListenAndServe(":8080", nil)
@@ -83,4 +88,54 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	if er != nil {
 		log.Fatal(er)
 	}
+}
+
+func home(writer http.ResponseWriter, request *http.Request) {
+  user := checkLogin()
+
+  db, _ := gorm.Open(dbDriver, dbName)
+  defer db.Close()
+
+  if request.Method == "POST" {
+    switch request.PostFormValue("form") {
+
+    case "post":
+      address := request.PostFormValue("address")
+      address = strings.TrimSpace(address)
+      if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
+        address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
+      }
+
+      post := migration.Post{
+        Address: address,
+        Message: request.PostFormValue("message"),
+        UserId:  int(user.Model.ID),
+      }
+
+      db.Create(&post)
+    }
+  }
+
+  var postList []migration.Post
+
+  db.Where("user_id=?", user.ID).Order("created_at desc").Limit(10).Find(&postList)
+
+  item := struct {
+    Title string
+    Message string
+    Name string
+    Account string
+    PostList []migration.Post
+  }{
+    Title: "Home",
+    Message: "User account=\"" + user.Account +"\".",
+    Name: user.Name,
+    Account: user.Account,
+    PostList: postList,
+  }
+
+  er := page("home").Execute(writer, item)
+  if er != nil {
+    log.Fatal(er)
+  }
 }
