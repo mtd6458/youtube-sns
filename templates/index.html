@@ -2,7 +2,7 @@
 <p>{{ .Message }}</p>
 
 <h4 class="mt-4">Post list</h4>
-{{ range $n,$Item := .PostList }}
+{{ range $n, $Item := .PostList }}
 <div class="media border m-1 p-2">
   <a href="/post?pid={{ $Item.Model.ID }}">
       <img class="mr-3" src="https://img.youtube.com/vi/{{ $Item.Address }}/default.jpg" alt="Generic placeholder image">
