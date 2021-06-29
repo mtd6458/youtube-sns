@@ -98,25 +98,8 @@ func home(writer http.ResponseWriter, request *http.Request) {
 
   if request.Method == "POST" {
     switch request.PostFormValue("form") {
-
     case "post":
-      address := request.PostFormValue("address")
-      address = strings.TrimSpace(address)
-      if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
-        address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
-      }
-
-      if strings.Contains(address, "ab_channel") {
-		address = address[:strings.Index(address, "&ab_channel")]
-	  }
-
-      post := migration.Post{
-        Address: address,
-        Message: request.PostFormValue("message"),
-        UserId:  int(user.Model.ID),
-      }
-
-      db.Create(&post)
+		savePostRecord(request, user, db)
     }
   }
 
@@ -142,4 +125,24 @@ func home(writer http.ResponseWriter, request *http.Request) {
   if er != nil {
     log.Fatal(er)
   }
+}
+
+func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
+	address := request.PostFormValue("address")
+	address = strings.TrimSpace(address)
+	if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
+		address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
+	}
+
+	if strings.Contains(address, "&ab_channel") {
+		address = address[:strings.Index(address, "&ab_channel")]
+	}
+
+	post := migration.Post{
+		Address: address,
+		Message: request.PostFormValue("message"),
+		UserId:  int(user.Model.ID),
+	}
+
+	db.Create(&post)
 }
