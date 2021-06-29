@@ -34,7 +34,7 @@ func main() {
 // login check
 func checkLogin() *migration.User {
 
-	ac := "taro@yamada.jp"
+	ac := "guest@guest.jp"
 
 	var user migration.User
 	db, _ := gorm.Open(dbDriver, dbName)
