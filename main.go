@@ -106,6 +106,10 @@ func home(writer http.ResponseWriter, request *http.Request) {
         address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
       }
 
+      if strings.Contains(address, "ab_channel") {
+		address = address[:strings.Index(address, "&ab_channel")]
+	  }
+
       post := migration.Post{
         Address: address,
         Message: request.PostFormValue("message"),
