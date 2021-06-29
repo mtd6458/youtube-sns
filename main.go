@@ -47,12 +47,12 @@ func checkLogin() *migration.User {
 
 // get target Template.
 func page(fname string) *template.Template {
-	tmps, _ := template.ParseFiles(
+	templates, _ := template.ParseFiles(
 		"templates/"+fname+".html",
 		"templates/head.html",
 		"templates/foot.html",
 	)
-	return  tmps
+	return templates
 }
 
 // top page handler
