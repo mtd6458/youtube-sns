@@ -6,6 +6,7 @@ import (
   "html/template"
   "log"
   "net/http"
+  "strconv"
   "strings"
 
   _ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -26,6 +27,10 @@ func main() {
 
   http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
     home(writer, request)
+  })
+
+  http.HandleFunc("/post", func(writer http.ResponseWriter, request *http.Request) {
+    post(writer, request)
   })
 
   http.ListenAndServe(":8080", nil)
@@ -145,4 +150,53 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 	}
 
 	db.Create(&post)
+}
+
+func post(writer http.ResponseWriter, request *http.Request) {
+  user := checkLogin()
+
+  pid := request.FormValue("pid")
+  db, _ := gorm.Open(dbDriver, dbName)
+  defer db.Close()
+
+  if request.Method == "POST" {
+    msg := request.PostFormValue("message")
+    pId, _ := strconv.Atoi(pid)
+    comment := migration.Comment{
+      UserId:  int(user.Model.ID),
+      PostId:  pId,
+      Message: msg,
+    }
+    db.Create(&comment)
+  }
+
+  var post migration.Post
+  var commentJoin []migration.CommentJoin
+
+  db.Where("id = ?", pid).First(&post)
+  db.Table("comments").
+    Select("comments.*, users.id, users.name").
+    Joins("join users on users.id = comments.user_id").
+    Where("comments.post_id = ?", pid).
+    Order("created_at desc").
+    Find(&commentJoin)
+
+  item := struct {
+    Title string
+    Name string
+    Account string
+    Post migration.Post
+    CommentJoin []migration.CommentJoin
+  }{
+    Title: "Post",
+    Name: user.Name,
+    Account: user.Account,
+    Post: post,
+    CommentJoin: commentJoin,
+  }
+
+  er := page("post").Execute(writer, item)
+  if er != nil {
+    log.Fatal(er)
+  }
 }
