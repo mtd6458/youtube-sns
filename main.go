@@ -192,7 +192,7 @@ func post(writer http.ResponseWriter, request *http.Request) {
     Name: user.Name,
     Account: user.Account,
     Post: post,
-	CommentJoinList: commentJoinList,
+    CommentJoinList: commentJoinList,
   }
 
   er := page("post").Execute(writer, item)
