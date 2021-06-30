@@ -1,0 +1,14 @@
+{{ template "header" }}
+
+<p>{{ .Post.Message }}</p>
+
+
+CommentJoinList
+{{ range $n, $Item := .CommentJoinList }}
+<p>{{ $Item.Comment }}</p>
+<p>{{ $Item.Post }}</p>
+
+{{ end }}
+
+
+{{ template "footer" }}
