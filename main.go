@@ -171,7 +171,7 @@ func post(writer http.ResponseWriter, request *http.Request) {
   }
 
   var post migration.Post
-  var commentJoin []migration.CommentJoin
+  var commentJoinList []migration.CommentJoin
 
   db.Where("id = ?", pid).First(&post)
   db.Table("comments").
@@ -179,20 +179,20 @@ func post(writer http.ResponseWriter, request *http.Request) {
     Joins("join users on users.id = comments.user_id").
     Where("comments.post_id = ?", pid).
     Order("created_at desc").
-    Find(&commentJoin)
+    Find(&commentJoinList)
 
   item := struct {
     Title string
     Name string
     Account string
     Post migration.Post
-    CommentJoin []migration.CommentJoin
+    CommentJoinList []migration.CommentJoin
   }{
     Title: "Post",
     Name: user.Name,
     Account: user.Account,
     Post: post,
-    CommentJoin: commentJoin,
+	CommentJoinList: commentJoinList,
   }
 
   er := page("post").Execute(writer, item)
