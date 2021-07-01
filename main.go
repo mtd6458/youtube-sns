@@ -110,7 +110,11 @@ func home(writer http.ResponseWriter, request *http.Request) {
 
   var postList []migration.Post
 
-  db.Where("user_id=?", user.ID).Order("created_at desc").Limit(10).Find(&postList)
+  db.Where("user_id=?", user.ID).
+  	Not("address", "").
+  	Order("created_at desc").
+  	Limit(10).
+  	Find(&postList)
 
   item := struct {
     Title string
