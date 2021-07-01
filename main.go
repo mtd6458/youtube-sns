@@ -135,6 +135,11 @@ func home(writer http.ResponseWriter, request *http.Request) {
 func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 	address := request.PostFormValue("address")
 	address = strings.TrimSpace(address)
+
+	if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false{
+		return
+	}
+
 	if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
 		address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
 	}
