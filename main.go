@@ -68,9 +68,9 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	defer db.Close()
 
 	var postList []migration.Post
-	db.Where("group_id > 0").Order("created_at desc").Limit(10).Find(&postList)
+  var groupList []migration.Group
 
-	var groupList []migration.Group
+  db.Where("group_id > 0").Order("created_at desc").Limit(10).Find(&postList)
 	db.Order("created_at desc").Limit(10).Find(&groupList)
 
 	item := struct {
@@ -104,17 +104,33 @@ func home(writer http.ResponseWriter, request *http.Request) {
   if request.Method == "POST" {
     switch request.PostFormValue("form") {
     case "post":
-		savePostRecord(request, user, db)
+		  savePostRecord(request, user, db)
+    case "group":
+      fmt.Println(request.PostFormValue("name"))
+      fmt.Print(request.PostFormValue("message"))
+      group := migration.Group{
+        UserId: int(user.Model.ID),
+        Name: request.PostFormValue("name"),
+        Message: request.PostFormValue("message"),
+      }
+
+      db.Create(group)
     }
   }
 
   var postList []migration.Post
+  var groupList []migration.Group
 
   db.Where("user_id=?", user.ID).
-  	Not("address", "").
+    Not("address", "").
   	Order("created_at desc").
   	Limit(10).
   	Find(&postList)
+
+  db.Where("user_id=?", user.ID).
+    Order("created_at desc").
+  	Limit(10).
+  	Find(&groupList)
 
   item := struct {
     Title string
@@ -122,12 +138,14 @@ func home(writer http.ResponseWriter, request *http.Request) {
     Name string
     Account string
     PostList []migration.Post
+    GroupList []migration.Group
   }{
     Title: "Home",
     Message: "User account=\"" + user.Account +"\".",
     Name: user.Name,
     Account: user.Account,
     PostList: postList,
+    GroupList: groupList,
   }
 
   er := page("home").Execute(writer, item)
