@@ -106,15 +106,7 @@ func home(writer http.ResponseWriter, request *http.Request) {
     case "post":
 		  savePostRecord(request, user, db)
     case "group":
-      fmt.Println(request.PostFormValue("name"))
-      fmt.Print(request.PostFormValue("message"))
-      group := migration.Group{
-        UserId: int(user.Model.ID),
-        Name: request.PostFormValue("name"),
-        Message: request.PostFormValue("message"),
-      }
-
-      db.Create(group)
+      saveGroupRecord(request, user, db)
     }
   }
 
@@ -185,6 +177,16 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 	}
 
 	db.Create(&post)
+}
+
+func saveGroupRecord(request *http.Request, user *migration.User, db *gorm.DB) {
+  group := migration.Group{
+    UserId: int(user.Model.ID),
+    Name: request.PostFormValue("name"),
+    Message: request.PostFormValue("message"),
+  }
+
+  db.Create(&group)
 }
 
 func post(writer http.ResponseWriter, request *http.Request) {
