@@ -33,6 +33,10 @@ func main() {
     post(writer, request)
   })
 
+  http.HandleFunc("/group", func(writer http.ResponseWriter, request *http.Request) {
+    group(writer, request)
+  })
+
   http.ListenAndServe(":8080", nil)
 }
 
@@ -233,6 +237,69 @@ func post(writer http.ResponseWriter, request *http.Request) {
   }
 
   er := page("post").Execute(writer, item)
+  if er != nil {
+    log.Fatal(er)
+  }
+}
+
+// group page handler
+func group(writer http.ResponseWriter, request *http.Request) {
+  user := checkLogin()
+
+  gid := request.FormValue("gid")
+  db, _ := gorm.Open(dbDriver, dbName)
+  defer db.Close()
+
+  if request.Method == "POST" {
+    address := request.PostFormValue("address")
+    address = strings.TrimSpace(address)
+    if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false{
+      return
+    }
+
+    if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
+      address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
+    }
+
+    if strings.Contains(address, "&ab_channel") {
+      address = address[:strings.Index(address, "&ab_channel")]
+    }
+
+    if strings.Contains(address, "&list") {
+      address = address[:strings.Index(address, "&list")]
+    }
+
+    if strings.Contains(address, "&index") {
+      address = address[:strings.Index(address, "&index")]
+    }
+
+    gId, _ := strconv.Atoi(gid)
+    post := migration.Post{
+      UserId: int(user.Model.ID),
+      Address: address,
+      Message: request.PostFormValue("message"),
+      GroupId: gId,
+    }
+    db.Create(&post)
+  }
+
+  var group migration.Group
+  var postList []migration.Post
+
+  db.Where("id = ?", gid).First(&group)
+  db.Order("created_at desc").Model(&group).Related(&postList)
+
+  item := struct {
+    Message string
+    Group migration.Group
+    PostList []migration.Post
+  }{
+    Message: "Group id=" + gid,
+    Group: group,
+    PostList: postList,
+  }
+
+  er := page("group").Execute(writer, item)
   if er != nil {
     log.Fatal(er)
   }
