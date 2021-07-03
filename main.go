@@ -170,6 +170,14 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 		address = address[:strings.Index(address, "&ab_channel")]
 	}
 
+	if strings.Contains(address, "&list") {
+		address = address[:strings.Index(address, "&list")]
+	}
+
+	if strings.Contains(address, "&index") {
+		address = address[:strings.Index(address, "&index")]
+	}
+
 	post := migration.Post{
 		Address: address,
 		Message: request.PostFormValue("message"),
