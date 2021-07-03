@@ -40,7 +40,6 @@ func main() {
   http.ListenAndServe(":8080", nil)
 }
 
-// login check
 func checkLogin() *migration.User {
 
 	ac := "guest@guest.jp"
@@ -99,6 +98,7 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	}
 }
 
+// home page handler
 func home(writer http.ResponseWriter, request *http.Request) {
   user := checkLogin()
 
@@ -193,6 +193,7 @@ func saveGroupRecord(request *http.Request, user *migration.User, db *gorm.DB) {
   db.Create(&group)
 }
 
+// post page handler
 func post(writer http.ResponseWriter, request *http.Request) {
   user := checkLogin()
 
