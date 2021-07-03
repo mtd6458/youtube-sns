@@ -1,4 +1,5 @@
 {{ template "header" }}
+
 <p>{{ .Message }}</p>
 <h4 class="mt-5">Post.</h4>
 <form method="post" action="/home">
@@ -16,16 +17,18 @@
 </form>
 
 <h5 class="mt-3">Post list.</h5>
+<div class="style-scope">
 {{ range $n, $Item := .PostList }}
-<div class="media border m-1 p-2">
-  <a href="/post?pid={{ $Item.Model.ID }}">
-    <img class="mr-3" src="https://img.youtube.com/vi/{{ $Item.Address }}/default.jpg" alt="Generic placeholder image">
-  </a>
-  <div class="media-body">
-    <h5 class="mt-0">{{ $Item.Message }}</h5>
+  <div class="media media-content" >
+    <a href="/post?pid={{ $Item.Model.ID }}">
+      <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Address }}/hq720.jpg" alt="Generic placeholder image">
+    </a>
+    <div class="media-body">
+      <h6 class="mt-0">{{ $Item.Message }}</h6>
+    </div>
   </div>
-</div>
 {{ end }}
+</div>
 
 <h5 class="mt-3">Group list.</h5>
 <form method="post" action="/home">

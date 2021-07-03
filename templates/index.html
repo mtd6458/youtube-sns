@@ -2,17 +2,17 @@
 <p>{{ .Message }}</p>
 
 <h4 class="mt-4">Post list</h4>
+<div class="style-scope">
 {{ range $n, $Item := .PostList }}
-<div class="media border m-1 p-2">
-  <a href="/post?pid={{ $Item.Model.ID }}">
-      <img class="mr-3" src="https://img.youtube.com/vi/{{ $Item.Address }}/default.jpg" alt="Generic placeholder image">
-  </a>
-  <div class="media-body">
-    <h5 class="mt-0">{{ $Item.Message }}</h5>
+  <div class="media media-content">
+    <a href="/post?pid={{ $Item.Model.ID }}">
+        <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Address }}/default.jpg" alt="Generic placeholder image">
+    </a>
+    <div class="media-body">
+      <h5 class="mt-0">{{ $Item.Message }}</h5>
+    </div>
   </div>
-</div>
-
-
 {{ end }}
+</div>
 
 {{ template "footer" }}
