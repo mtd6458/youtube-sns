@@ -15,4 +15,14 @@
 {{ end }}
 </div>
 
+<h4 class="mt-4">Group list.</h4>
+{{ range $n, $Item := .GroupList }}
+  <div class="media border m-1 p-2">
+    <div class="media-body">
+      <a href="/group?gid={{ $Item.ID }}"><h5 class="mt-0">{{ $Item.Name }}</h5></a>
+      {{ $Item.Message }}
+    </div>
+  </div>
+{{ end }}
+
 {{ template "footer" }}
