@@ -78,14 +78,12 @@ func index(w http.ResponseWriter, rq *http.Request) {
 
 	item := struct {
 		Title     string
-		Message   string
 		Name      string
 		Account   string
 		PostList  []migration.Post
 		GroupList []migration.Group
 	}{
 		Title:     "Index",
-		Message:   "This is Top page.",
 		Name:      user.Name,
 		Account:   user.Account,
 		PostList:  postList,
