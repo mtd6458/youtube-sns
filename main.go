@@ -1,43 +1,43 @@
 package main
 
 import (
-  "github.com/jinzhu/gorm"
-  "github.com/youtube-sns/migration"
-  "html/template"
-  "log"
-  "net/http"
-  "strconv"
-  "strings"
+	"github.com/jinzhu/gorm"
+	"github.com/youtube-sns/migration"
+	"html/template"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
 
-  _ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // db variable.
 var dbDriver = "sqlite3"
-var dbName   = "data.sqlite3"
+var dbName = "data.sqlite3"
 
 func main() {
 
-  /**
-   * routing
-   */
-  http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-    index(writer, request)
-  })
+	/**
+	 * routing
+	 */
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		index(writer, request)
+	})
 
-  http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
-    home(writer, request)
-  })
+	http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
+		home(writer, request)
+	})
 
-  http.HandleFunc("/post", func(writer http.ResponseWriter, request *http.Request) {
-    post(writer, request)
-  })
+	http.HandleFunc("/post", func(writer http.ResponseWriter, request *http.Request) {
+		post(writer, request)
+	})
 
-  http.HandleFunc("/group", func(writer http.ResponseWriter, request *http.Request) {
-    group(writer, request)
-  })
+	http.HandleFunc("/group", func(writer http.ResponseWriter, request *http.Request) {
+		group(writer, request)
+	})
 
-  http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", nil)
 }
 
 func checkLogin() *migration.User {
@@ -50,7 +50,7 @@ func checkLogin() *migration.User {
 
 	db.Where("account = ?", ac).First(&user)
 
-	return  &user
+	return &user
 }
 
 // get target Template.
@@ -71,9 +71,9 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	defer db.Close()
 
 	var postList []migration.Post
-  var groupList []migration.Group
+	var groupList []migration.Group
 
-  db.Where("group_id > 0").Order("created_at desc").Limit(12).Find(&postList)
+	db.Where("group_id > 0").Order("created_at desc").Limit(12).Find(&postList)
 	db.Order("created_at desc").Limit(12).Find(&groupList)
 
 	item := struct {
@@ -98,54 +98,54 @@ func index(w http.ResponseWriter, rq *http.Request) {
 
 // home page handler
 func home(writer http.ResponseWriter, request *http.Request) {
-  user := checkLogin()
+	user := checkLogin()
 
-  db, _ := gorm.Open(dbDriver, dbName)
-  defer db.Close()
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
 
-  if request.Method == "POST" {
-    switch request.PostFormValue("form") {
-    case "post":
-		  savePostRecord(request, user, db)
-    case "group":
-      saveGroupRecord(request, user, db)
-    }
-  }
+	if request.Method == "POST" {
+		switch request.PostFormValue("form") {
+		case "post":
+			savePostRecord(request, user, db)
+		case "group":
+			saveGroupRecord(request, user, db)
+		}
+	}
 
-  var postList []migration.Post
-  var groupList []migration.Group
+	var postList []migration.Post
+	var groupList []migration.Group
 
-  db.Where("user_id=?", user.ID).
-    Not("address", "").
-  	Order("created_at desc").
-  	Limit(12).
-  	Find(&postList)
+	db.Where("user_id=?", user.ID).
+		Not("address", "").
+		Order("created_at desc").
+		Limit(12).
+		Find(&postList)
 
-  db.Where("user_id=?", user.ID).
-    Order("created_at desc").
-  	Limit(12).
-  	Find(&groupList)
+	db.Where("user_id=?", user.ID).
+		Order("created_at desc").
+		Limit(12).
+		Find(&groupList)
 
-  item := struct {
-    Title string
-    Message string
-    Name string
-    Account string
-    PostList []migration.Post
-    GroupList []migration.Group
-  }{
-    Title: "Home",
-    Message: "User account=\"" + user.Account +"\".",
-    Name: user.Name,
-    Account: user.Account,
-    PostList: postList,
-    GroupList: groupList,
-  }
+	item := struct {
+		Title     string
+		Message   string
+		Name      string
+		Account   string
+		PostList  []migration.Post
+		GroupList []migration.Group
+	}{
+		Title:     "Home",
+		Message:   "User account=\"" + user.Account + "\".",
+		Name:      user.Name,
+		Account:   user.Account,
+		PostList:  postList,
+		GroupList: groupList,
+	}
 
-  er := page("home").Execute(writer, item)
-  if er != nil {
-    log.Fatal(er)
-  }
+	er := page("home").Execute(writer, item)
+	if er != nil {
+		log.Fatal(er)
+	}
 }
 
 func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
@@ -182,124 +182,124 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 }
 
 func saveGroupRecord(request *http.Request, user *migration.User, db *gorm.DB) {
-  group := migration.Group{
-    UserId: int(user.Model.ID),
-    Name: request.PostFormValue("name"),
-    Message: request.PostFormValue("message"),
-  }
+	group := migration.Group{
+		UserId:  int(user.Model.ID),
+		Name:    request.PostFormValue("name"),
+		Message: request.PostFormValue("message"),
+	}
 
-  db.Create(&group)
+	db.Create(&group)
 }
 
 // post page handler
 func post(writer http.ResponseWriter, request *http.Request) {
-  user := checkLogin()
+	user := checkLogin()
 
-  pid := request.FormValue("pid")
-  db, _ := gorm.Open(dbDriver, dbName)
-  defer db.Close()
+	pid := request.FormValue("pid")
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
 
-  if request.Method == "POST" {
-    msg := request.PostFormValue("message")
-    pId, _ := strconv.Atoi(pid)
-    comment := migration.Comment{
-      UserId:  int(user.Model.ID),
-      PostId:  pId,
-      Message: msg,
-    }
-    db.Create(&comment)
-  }
+	if request.Method == "POST" {
+		msg := request.PostFormValue("message")
+		pId, _ := strconv.Atoi(pid)
+		comment := migration.Comment{
+			UserId:  int(user.Model.ID),
+			PostId:  pId,
+			Message: msg,
+		}
+		db.Create(&comment)
+	}
 
-  var post migration.Post
-  var commentJoinList []migration.CommentJoin
+	var post migration.Post
+	var commentJoinList []migration.CommentJoin
 
-  db.Where("id = ?", pid).First(&post)
-  db.Table("comments").
-    Select("comments.*, users.id, users.name").
-    Joins("join users on users.id = comments.user_id").
-    Where("comments.post_id = ?", pid).
-    Order("created_at desc").
-    Find(&commentJoinList)
+	db.Where("id = ?", pid).First(&post)
+	db.Table("comments").
+		Select("comments.*, users.id, users.name").
+		Joins("join users on users.id = comments.user_id").
+		Where("comments.post_id = ?", pid).
+		Order("created_at desc").
+		Find(&commentJoinList)
 
-  item := struct {
-    Title string
-    Name string
-    Account string
-    Post migration.Post
-    CommentJoinList []migration.CommentJoin
-  }{
-    Title: "Post",
-    Name: user.Name,
-    Account: user.Account,
-    Post: post,
-    CommentJoinList: commentJoinList,
-  }
+	item := struct {
+		Title           string
+		Name            string
+		Account         string
+		Post            migration.Post
+		CommentJoinList []migration.CommentJoin
+	}{
+		Title:           "Post",
+		Name:            user.Name,
+		Account:         user.Account,
+		Post:            post,
+		CommentJoinList: commentJoinList,
+	}
 
-  er := page("post").Execute(writer, item)
-  if er != nil {
-    log.Fatal(er)
-  }
+	er := page("post").Execute(writer, item)
+	if er != nil {
+		log.Fatal(er)
+	}
 }
 
 // group page handler
 func group(writer http.ResponseWriter, request *http.Request) {
-  user := checkLogin()
+	user := checkLogin()
 
-  gid := request.FormValue("gid")
-  db, _ := gorm.Open(dbDriver, dbName)
-  defer db.Close()
+	gid := request.FormValue("gid")
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
 
-  if request.Method == "POST" {
-    address := request.PostFormValue("address")
-    address = strings.TrimSpace(address)
-    if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false{
-      return
-    }
+	if request.Method == "POST" {
+		address := request.PostFormValue("address")
+		address = strings.TrimSpace(address)
+		if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false {
+			return
+		}
 
-    if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
-      address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
-    }
+		if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
+			address = strings.TrimPrefix(address, "https://www.youtube.com/watch?v=")
+		}
 
-    if strings.Contains(address, "&ab_channel") {
-      address = address[:strings.Index(address, "&ab_channel")]
-    }
+		if strings.Contains(address, "&ab_channel") {
+			address = address[:strings.Index(address, "&ab_channel")]
+		}
 
-    if strings.Contains(address, "&list") {
-      address = address[:strings.Index(address, "&list")]
-    }
+		if strings.Contains(address, "&list") {
+			address = address[:strings.Index(address, "&list")]
+		}
 
-    if strings.Contains(address, "&index") {
-      address = address[:strings.Index(address, "&index")]
-    }
+		if strings.Contains(address, "&index") {
+			address = address[:strings.Index(address, "&index")]
+		}
 
-    gId, _ := strconv.Atoi(gid)
-    post := migration.Post{
-      UserId: int(user.Model.ID),
-      Address: address,
-      Message: request.PostFormValue("message"),
-      GroupId: gId,
-    }
-    db.Create(&post)
-  }
+		gId, _ := strconv.Atoi(gid)
+		post := migration.Post{
+			UserId:  int(user.Model.ID),
+			Address: address,
+			Message: request.PostFormValue("message"),
+			GroupId: gId,
+		}
+		db.Create(&post)
+	}
 
-  var group migration.Group
-  var postList []migration.Post
+	var group migration.Group
+	var postList []migration.Post
 
-  db.Where("id = ?", gid).First(&group)
-  db.Order("created_at desc").Model(&group).Related(&postList)
+	db.Where("id = ?", gid).First(&group)
+	db.Order("created_at desc").Model(&group).Related(&postList)
 
-  item := struct {
-    Message string
-    Group migration.Group
-    PostList []migration.Post
-  }{
-    Message: "Group id=" + gid,
-    Group: group,
-    PostList: postList,
-  }
+	item := struct {
+		Message  string
+		Group    migration.Group
+		PostList []migration.Post
+	}{
+		Message:  "Group id=" + gid,
+		Group:    group,
+		PostList: postList,
+	}
 
-  er := page("group").Execute(writer, item)
-  if er != nil {
-    log.Fatal(er)
-  }
+	er := page("group").Execute(writer, item)
+	if er != nil {
+		log.Fatal(er)
+	}
 }
