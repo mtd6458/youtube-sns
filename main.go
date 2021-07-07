@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	"github.com/youtube-sns/migration"
 	"html/template"
@@ -16,6 +17,9 @@ import (
 var dbDriver = "sqlite3"
 var dbName = "data.sqlite3"
 
+var sessionName = "ytboard-session"
+var cs = sessions.NewCookieStore([]byte("secret-key-1234"))
+
 func main() {
 
 	/**
@@ -23,6 +27,10 @@ func main() {
 	 */
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		index(writer, request)
+	})
+
+	http.HandleFunc("/login", func(writer http.ResponseWriter, request *http.Request) {
+		login(writer, request)
 	})
 
 	http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
@@ -96,6 +104,68 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	}
 }
 
+func login(w http.ResponseWriter, request *http.Request) {
+	item := struct {
+		Title   string
+		Message string
+		Account string
+	}{
+		Title:   "Login",
+		Message: "type your account & password:",
+		Account: "",
+	}
+
+	if request.Method == "GET" {
+		er := page("login").Execute(w, item)
+		if er != nil {
+			log.Fatal(er)
+		}
+		return
+	}
+
+	if request.Method == "POST" {
+		db, _ := gorm.Open(dbDriver, dbName)
+		defer db.Close()
+
+		user := request.PostFormValue("account")
+		pass := request.PostFormValue("pass")
+		item.Account = user
+
+		// check account and password
+		var re int
+		var user migration.User
+		db.Where("account = ? and password = ?", user, pass).Find(&user).Count(&re)
+
+		if re <= 0 {
+			item.Message = "Wrong account or password."
+			page("login").Execute(w, item)
+			return
+		}
+
+		// login.
+		session, _ := cs.Get(request, sessionName)
+		session.Values["login"] = true
+		session.Values["account"] = user
+		session.Values["name"] = user.Name
+		session.Save(request, w)
+		http.Redirect(w, request, "/", 302)
+	}
+
+	er := page("login").Execute(w, item)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
+
+func logout() {
+	session, _ := cs.Get(request, sessionName)
+	session.Values["login"] = true
+	session.Values["account"] = user
+	session.Values["name"] = user.Name
+	session.Save(request, w)
+	http.Redirect(w, request, "/", 302)
+}
+
 // home page handler
 func home(writer http.ResponseWriter, request *http.Request) {
 	user := checkLogin()
@@ -152,7 +222,7 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 	address := request.PostFormValue("address")
 	address = strings.TrimSpace(address)
 
-	if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false{
+	if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false {
 		return
 	}
 
