@@ -157,7 +157,9 @@ func login(w http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func logout() {
+func logout(w http.ResponseWriter, request *http.Request) {
+	user := checkLogin()
+
 	session, _ := cs.Get(request, sessionName)
 	session.Values["login"] = true
 	session.Values["account"] = user
