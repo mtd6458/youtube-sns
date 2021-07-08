@@ -127,14 +127,14 @@ func login(w http.ResponseWriter, request *http.Request) {
 		db, _ := gorm.Open(dbDriver, dbName)
 		defer db.Close()
 
-		user := request.PostFormValue("account")
+		account := request.PostFormValue("account")
 		pass := request.PostFormValue("pass")
-		item.Account = user
+		item.Account = account
 
 		// check account and password
 		var re int
 		var user migration.User
-		db.Where("account = ? and password = ?", user, pass).Find(&user).Count(&re)
+		db.Where("account = ? and password = ?", account, pass).Find(&user).Count(&re)
 
 		if re <= 0 {
 			item.Message = "Wrong account or password."
