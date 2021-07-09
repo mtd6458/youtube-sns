@@ -198,25 +198,30 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		Limit(12).
 		Find(&groupList)
 
-	item := struct {
+	headItem := struct {
+    UserName  string
+  }{
+    UserName:  user.Name,
+  }
+
+	homeItem := struct {
 		Title     string
-		Message   string
-		Name      string
-		Account   string
 		PostList  []migration.Post
 		GroupList []migration.Group
 	}{
 		Title:     "Home",
-		Message:   "User account=\"" + user.Account + "\".",
-		Name:      user.Name,
-		Account:   user.Account,
 		PostList:  postList,
 		GroupList: groupList,
 	}
 
-	er := page("home").Execute(writer, item)
-	if er != nil {
-		log.Fatal(er)
+	headEr := page("head").Execute(writer, headItem)
+  if headEr != nil {
+    log.Fatal(headEr)
+  }
+
+	homeEr := page("home").Execute(writer, homeItem)
+	if homeEr != nil {
+		log.Fatal(homeEr)
 	}
 }
 
