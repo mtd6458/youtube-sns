@@ -214,14 +214,9 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		GroupList: groupList,
 	}
 
-	headEr := page("head").Execute(writer, headItem)
-  if headEr != nil {
-    log.Fatal(headEr)
-  }
-
-	homeEr := page("home").Execute(writer, homeItem)
-	if homeEr != nil {
-		log.Fatal(homeEr)
+	er := page("home").Execute(writer, item)
+	if er != nil {
+		log.Fatal(er)
 	}
 }
 
