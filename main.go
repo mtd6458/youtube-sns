@@ -24,26 +24,16 @@ func main() {
 	/**
 	 * routing
 	 */
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		index(writer, request)
-	})
+	http.HandleFunc("/", index)
 
-	http.HandleFunc("/login", func(writer http.ResponseWriter, request *http.Request) {
-		login(writer, request)
-	})
+	http.HandleFunc("/login", login)
 
-	http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
-		home(writer, request)
-	})
+	http.HandleFunc("/home", home)
 
-	http.HandleFunc("/post", func(writer http.ResponseWriter, request *http.Request) {
-		post(writer, request)
-	})
+	http.HandleFunc("/post", post)
 
-	http.HandleFunc("/group", func(writer http.ResponseWriter, request *http.Request) {
-		group(writer, request)
-	})
-
+	http.HandleFunc("/group", group)
+	
 	http.ListenAndServe(":8080", nil)
 }
 
