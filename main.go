@@ -187,13 +187,8 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		Limit(12).
 		Find(&groupList)
 
-	headItem := struct {
-    UserName  string
-  }{
-    UserName:  user.Name,
-  }
 
-	homeItem := struct {
+	item := struct {
 		Title     string
 		PostList  []migration.Post
 		GroupList []migration.Group
