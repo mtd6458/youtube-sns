@@ -3,14 +3,13 @@ package main
 import (
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/youtube-sns/migration"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // db variable.
