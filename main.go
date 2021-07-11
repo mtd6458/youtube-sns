@@ -75,14 +75,12 @@ func index(w http.ResponseWriter, rq *http.Request) {
 
 	item := struct {
 		Title     string
-		Name      string
-		Account   string
+		UserName  string
 		PostList  []migration.Post
 		GroupList []migration.Group
 	}{
 		Title:     "Index",
-		Name:      user.Name,
-		Account:   user.Account,
+		UserName:  user.Name,
 		PostList:  postList,
 		GroupList: groupList,
 	}
@@ -190,10 +188,12 @@ func home(writer http.ResponseWriter, request *http.Request) {
 
 	item := struct {
 		Title     string
+		UserName  string
 		PostList  []migration.Post
 		GroupList []migration.Group
 	}{
 		Title:     "Home",
+		UserName:  user.Name,
 		PostList:  postList,
 		GroupList: groupList,
 	}
@@ -279,14 +279,12 @@ func post(writer http.ResponseWriter, request *http.Request) {
 
 	item := struct {
 		Title           string
-		Name            string
-		Account         string
+		UserName        string
 		Post            migration.Post
 		CommentJoinList []migration.CommentJoin
 	}{
 		Title:           "Post",
-		Name:            user.Name,
-		Account:         user.Account,
+		UserName:        user.Name,
 		Post:            post,
 		CommentJoinList: commentJoinList,
 	}
