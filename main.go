@@ -343,10 +343,14 @@ func group(writer http.ResponseWriter, request *http.Request) {
 	db.Order("created_at desc").Model(&group).Related(&postList)
 
 	item := struct {
+		Title    string
+		UserName string
 		Message  string
 		Group    migration.Group
 		PostList []migration.Post
 	}{
+		Title:    "Group",
+		UserName: user.Name,
 		Message:  "Group id=" + gid,
 		Group:    group,
 		PostList: postList,
