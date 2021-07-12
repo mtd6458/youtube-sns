@@ -33,7 +33,7 @@ func main() {
 	http.HandleFunc("/post", post)
 
 	http.HandleFunc("/group", group)
-	
+
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -184,7 +184,6 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		Order("created_at desc").
 		Limit(12).
 		Find(&groupList)
-
 
 	item := struct {
 		Title     string
