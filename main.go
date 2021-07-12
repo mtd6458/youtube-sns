@@ -238,6 +238,12 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 }
 
 func saveGroupRecord(request *http.Request, user *migration.User, db *gorm.DB) {
+	name := request.PostFormValue("name")
+
+	if name == "" {
+		return
+	}
+
 	group := migration.Group{
 		UserId:  int(user.Model.ID),
 		Name:    request.PostFormValue("name"),
