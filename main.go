@@ -71,7 +71,7 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	var groupList []migration.Group
 
 	db.Where("group_id > 0").Order("created_at desc").Limit(12).Find(&postList)
-	db.Order("created_at desc").Limit(12).Find(&groupList)
+	db.Not("name", "").Order("created_at desc").Limit(12).Find(&groupList)
 
 	item := struct {
 		Title     string
@@ -181,6 +181,7 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		Find(&postList)
 
 	db.Where("user_id=?", user.ID).
+		Not("name", "").
 		Order("created_at desc").
 		Limit(12).
 		Find(&groupList)
