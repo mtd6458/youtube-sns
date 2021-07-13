@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	"github.com/youtube-sns/migration"
@@ -21,6 +22,7 @@ var sessionName = "ytboard-session"
 var cs = sessions.NewCookieStore([]byte("secret-key-1234"))
 
 func main() {
+	fmt.Println("http://localhost:8080/")
 
 	/**
 	 * routing
