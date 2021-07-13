@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/youtube-sns/migration"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // db variable.
@@ -27,25 +26,15 @@ func main() {
 	/**
 	 * routing
 	 */
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		index(writer, request)
-	})
+	http.HandleFunc("/", index)
 
-	http.HandleFunc("/login", func(writer http.ResponseWriter, request *http.Request) {
-		login(writer, request)
-	})
+	http.HandleFunc("/login", login)
 
-	http.HandleFunc("/home", func(writer http.ResponseWriter, request *http.Request) {
-		home(writer, request)
-	})
+	http.HandleFunc("/home", home)
 
-	http.HandleFunc("/post", func(writer http.ResponseWriter, request *http.Request) {
-		post(writer, request)
-	})
+	http.HandleFunc("/post", post)
 
-	http.HandleFunc("/group", func(writer http.ResponseWriter, request *http.Request) {
-		group(writer, request)
-	})
+	http.HandleFunc("/group", group)
 
 	http.ListenAndServe(":8080", nil)
 }
@@ -84,18 +73,16 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	var groupList []migration.Group
 
 	db.Where("group_id > 0").Order("created_at desc").Limit(12).Find(&postList)
-	db.Order("created_at desc").Limit(12).Find(&groupList)
+	db.Not("name", "").Order("created_at desc").Limit(12).Find(&groupList)
 
 	item := struct {
 		Title     string
-		Name      string
-		Account   string
+		UserName  string
 		PostList  []migration.Post
 		GroupList []migration.Group
 	}{
 		Title:     "Index",
-		Name:      user.Name,
-		Account:   user.Account,
+		UserName:  user.Name,
 		PostList:  postList,
 		GroupList: groupList,
 	}
@@ -129,14 +116,14 @@ func login(w http.ResponseWriter, request *http.Request) {
 		db, _ := gorm.Open(dbDriver, dbName)
 		defer db.Close()
 
-		user := request.PostFormValue("account")
+		account := request.PostFormValue("account")
 		pass := request.PostFormValue("pass")
-		item.Account = user
+		item.Account = account
 
 		// check account and password
 		var re int
 		var user migration.User
-		db.Where("account = ? and password = ?", user, pass).Find(&user).Count(&re)
+		db.Where("account = ? and password = ?", account, pass).Find(&user).Count(&re)
 
 		if re <= 0 {
 			item.Message = "Wrong account or password."
@@ -159,7 +146,9 @@ func login(w http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func logout() {
+func logout(w http.ResponseWriter, request *http.Request) {
+	user := checkLogin()
+
 	session, _ := cs.Get(request, sessionName)
 	session.Values["login"] = true
 	session.Values["account"] = user
@@ -194,22 +183,19 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		Find(&postList)
 
 	db.Where("user_id=?", user.ID).
+		Not("name", "").
 		Order("created_at desc").
 		Limit(12).
 		Find(&groupList)
 
 	item := struct {
 		Title     string
-		Message   string
-		Name      string
-		Account   string
+		UserName  string
 		PostList  []migration.Post
 		GroupList []migration.Group
 	}{
 		Title:     "Home",
-		Message:   "User account=\"" + user.Account + "\".",
-		Name:      user.Name,
-		Account:   user.Account,
+		UserName:  user.Name,
 		PostList:  postList,
 		GroupList: groupList,
 	}
@@ -254,6 +240,12 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 }
 
 func saveGroupRecord(request *http.Request, user *migration.User, db *gorm.DB) {
+	name := request.PostFormValue("name")
+
+	if name == "" {
+		return
+	}
+
 	group := migration.Group{
 		UserId:  int(user.Model.ID),
 		Name:    request.PostFormValue("name"),
@@ -295,14 +287,12 @@ func post(writer http.ResponseWriter, request *http.Request) {
 
 	item := struct {
 		Title           string
-		Name            string
-		Account         string
+		UserName        string
 		Post            migration.Post
 		CommentJoinList []migration.CommentJoin
 	}{
 		Title:           "Post",
-		Name:            user.Name,
-		Account:         user.Account,
+		UserName:        user.Name,
 		Post:            post,
 		CommentJoinList: commentJoinList,
 	}
@@ -361,10 +351,14 @@ func group(writer http.ResponseWriter, request *http.Request) {
 	db.Order("created_at desc").Model(&group).Related(&postList)
 
 	item := struct {
+		Title    string
+		UserName string
 		Message  string
 		Group    migration.Group
 		PostList []migration.Post
 	}{
+		Title:    "Group",
+		UserName: user.Name,
 		Message:  "Group id=" + gid,
 		Group:    group,
 		PostList: postList,
