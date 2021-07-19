@@ -34,7 +34,7 @@ func main() {
 
 	http.HandleFunc("/post", post)
 
-	http.HandleFunc("/group", group)
+	http.HandleFunc("/tag", tag)
 
 	http.ListenAndServe(":8080", nil)
 }
@@ -70,21 +70,21 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	defer db.Close()
 
 	var postList []migration.Post
-	var groupList []migration.Group
+	var tagList []migration.Tag
 
-	db.Where("group_id > 0").Order("created_at desc").Limit(12).Find(&postList)
-	db.Not("name", "").Order("created_at desc").Limit(12).Find(&groupList)
+	db.Where("tag_id > 0").Order("created_at desc").Limit(12).Find(&postList)
+	db.Not("name", "").Order("created_at desc").Limit(12).Find(&tagList)
 
 	item := struct {
-		Title     string
-		UserName  string
-		PostList  []migration.Post
-		GroupList []migration.Group
+		Title    string
+		UserName string
+		PostList []migration.Post
+		TagList  []migration.Tag
 	}{
-		Title:     "Index",
-		UserName:  user.Name,
-		PostList:  postList,
-		GroupList: groupList,
+		Title:    "Index",
+		UserName: user.Name,
+		PostList: postList,
+		TagList:  tagList,
 	}
 
 	er := page("index").Execute(w, item)
@@ -168,13 +168,13 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		switch request.PostFormValue("form") {
 		case "post":
 			savePostRecord(request, user, db)
-		case "group":
-			saveGroupRecord(request, user, db)
+		case "tag":
+			saveTagRecord(request, user, db)
 		}
 	}
 
 	var postList []migration.Post
-	var groupList []migration.Group
+	var tagList []migration.Tag
 
 	db.Where("user_id=?", user.ID).
 		Not("address", "").
@@ -186,18 +186,18 @@ func home(writer http.ResponseWriter, request *http.Request) {
 		Not("name", "").
 		Order("created_at desc").
 		Limit(12).
-		Find(&groupList)
+		Find(&tagList)
 
 	item := struct {
-		Title     string
-		UserName  string
-		PostList  []migration.Post
-		GroupList []migration.Group
+		Title    string
+		UserName string
+		PostList []migration.Post
+		TagList  []migration.Tag
 	}{
-		Title:     "Home",
-		UserName:  user.Name,
-		PostList:  postList,
-		GroupList: groupList,
+		Title:    "Home",
+		UserName: user.Name,
+		PostList: postList,
+		TagList:  tagList,
 	}
 
 	er := page("home").Execute(writer, item)
@@ -239,20 +239,20 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 	db.Create(&post)
 }
 
-func saveGroupRecord(request *http.Request, user *migration.User, db *gorm.DB) {
+func saveTagRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 	name := request.PostFormValue("name")
 
 	if name == "" {
 		return
 	}
 
-	group := migration.Group{
+	tag := migration.Tag{
 		UserId:  int(user.Model.ID),
 		Name:    request.PostFormValue("name"),
 		Message: request.PostFormValue("message"),
 	}
 
-	db.Create(&group)
+	db.Create(&tag)
 }
 
 // post page handler
@@ -303,11 +303,11 @@ func post(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// group page handler
-func group(writer http.ResponseWriter, request *http.Request) {
+// tag page handler
+func tag(writer http.ResponseWriter, request *http.Request) {
 	user := checkLogin()
 
-	gid := request.FormValue("gid")
+	tagId := request.FormValue("tagId")
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
@@ -334,37 +334,37 @@ func group(writer http.ResponseWriter, request *http.Request) {
 			address = address[:strings.Index(address, "&index")]
 		}
 
-		gId, _ := strconv.Atoi(gid)
+		tagId, _ := strconv.Atoi(tagId)
 		post := migration.Post{
 			UserId:  int(user.Model.ID),
 			Address: address,
 			Message: request.PostFormValue("message"),
-			GroupId: gId,
+			TagId:   tagId,
 		}
 		db.Create(&post)
 	}
 
-	var group migration.Group
+	var tag migration.Tag
 	var postList []migration.Post
 
-	db.Where("id = ?", gid).First(&group)
-	db.Order("created_at desc").Model(&group).Related(&postList)
+	db.Where("id = ?", tagId).First(&tag)
+	db.Order("created_at desc").Model(&tag).Related(&postList)
 
 	item := struct {
 		Title    string
 		UserName string
 		Message  string
-		Group    migration.Group
+		Tag      migration.Tag
 		PostList []migration.Post
 	}{
-		Title:    "Group",
+		Title:    "Tag",
 		UserName: user.Name,
-		Message:  "Group id=" + gid,
-		Group:    group,
+		Message:  "Tag id=" + tagId,
+		Tag:      tag,
 		PostList: postList,
 	}
 
-	er := page("group").Execute(writer, item)
+	er := page("tag").Execute(writer, item)
 	if er != nil {
 		log.Fatal(er)
 	}
