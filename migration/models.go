@@ -19,11 +19,11 @@ type Post struct {
 	Address		string
 	Message		string
 	UserId	 	int
-	GroupId 	int
+	TagId 	int
 }
 
-// Group model.
-type Group struct {
+// Tag model.
+type Tag struct {
 	gorm.Model
 	UserId		int
 	Name 		string
