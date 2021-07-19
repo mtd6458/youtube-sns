@@ -1,8 +1,8 @@
 {{ template "header" .}}
 
-<h4 class="mt-4">{{ .Group.Name }} group.</h4>
+<h4 class="mt-4">{{ .Tag.Name }} </h4>
 
-<form method="post" action="/group?gid={{ .Group.Model.ID }}">
+<form method="post" action="/tag?tagId={{ .Tag.Model.ID }}">
   <div class="form-group mt-4">
     <label for="address" class="h6">Youtube share address:</label>
     <input type="text" class="form-control"
