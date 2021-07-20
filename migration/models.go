@@ -27,7 +27,6 @@ type Tag struct {
 	gorm.Model
 	UserId		int
 	Name 		string
-	Message		string
 }
 
 // Comment model.
