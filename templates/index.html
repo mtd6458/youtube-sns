@@ -3,7 +3,7 @@
 {{ range $n, $Item := .TagList }}
   <div class="media border m-1 p-2" style="width: 12%; height: 5%; border-radius: 45px;">
     <div class="media-body">
-      <a href="/tag?tagId={{ $Item.ID }}"><h5 class="mt-0">{{ $Item.Name }}</h5></a>
+      <a href="/tag?tagId={{ $Item.ID }}"><h5 class="tag-clamp">{{ $Item.Name }}</h5></a>
     </div>
   </div>
 {{ end }}
