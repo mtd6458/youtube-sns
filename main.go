@@ -165,12 +165,19 @@ func home(writer http.ResponseWriter, request *http.Request) {
 	defer db.Close()
 
 	if request.Method == "POST" {
-		switch request.PostFormValue("form") {
-		case "post":
-			savePostRecord(request, user, db)
-		case "tag":
-			saveTagRecord(request, user, db)
+		name := request.PostFormValue("name")
+
+		var tag migration.Tag
+
+		if name != "" {
+			db.Where("name = ?", name).First(&tag)
+
+			if tag.Name == "" {
+				saveTagRecord(name, user, db, &tag)
+			}
 		}
+
+		savePostRecord(request, user, db, &tag)
 	}
 
 	var postList []migration.Post
@@ -206,7 +213,7 @@ func home(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
+func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB, tag *migration.Tag) {
 	address := request.PostFormValue("address")
 	address = strings.TrimSpace(address)
 
@@ -234,22 +241,16 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB) {
 		Address: address,
 		Message: request.PostFormValue("message"),
 		UserId:  int(user.Model.ID),
+		TagId:   int(tag.Model.ID),
 	}
 
 	db.Create(&post)
 }
 
-func saveTagRecord(request *http.Request, user *migration.User, db *gorm.DB) {
-	name := request.PostFormValue("name")
-
-	if name == "" {
-		return
-	}
-
-	tag := migration.Tag{
-		UserId:  int(user.Model.ID),
-		Name:    request.PostFormValue("name"),
-		Message: request.PostFormValue("message"),
+func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migration.Tag) {
+	tag = &migration.Tag{
+		UserId: int(user.Model.ID),
+		Name:   name,
 	}
 
 	db.Create(&tag)
