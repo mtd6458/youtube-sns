@@ -18,3 +18,4 @@ main
 .idea/
 data.sqlite3
 main_*
+.env
