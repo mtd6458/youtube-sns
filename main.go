@@ -28,7 +28,6 @@ func main() {
 	 */
 	http.HandleFunc("/", index)
 
-	http.HandleFunc("/login", login)
 
 	http.HandleFunc("/home", home)
 
@@ -88,59 +87,6 @@ func index(w http.ResponseWriter, rq *http.Request) {
 	}
 
 	er := page("index").Execute(w, item)
-	if er != nil {
-		log.Fatal(er)
-	}
-}
-
-func login(w http.ResponseWriter, request *http.Request) {
-	item := struct {
-		Title   string
-		Message string
-		Account string
-	}{
-		Title:   "Login",
-		Message: "type your account & password:",
-		Account: "",
-	}
-
-	if request.Method == "GET" {
-		er := page("login").Execute(w, item)
-		if er != nil {
-			log.Fatal(er)
-		}
-		return
-	}
-
-	if request.Method == "POST" {
-		db, _ := gorm.Open(dbDriver, dbName)
-		defer db.Close()
-
-		account := request.PostFormValue("account")
-		pass := request.PostFormValue("pass")
-		item.Account = account
-
-		// check account and password
-		var re int
-		var user migration.User
-		db.Where("account = ? and password = ?", account, pass).Find(&user).Count(&re)
-
-		if re <= 0 {
-			item.Message = "Wrong account or password."
-			page("login").Execute(w, item)
-			return
-		}
-
-		// login.
-		session, _ := cs.Get(request, sessionName)
-		session.Values["login"] = true
-		session.Values["account"] = user
-		session.Values["name"] = user.Name
-		session.Save(request, w)
-		http.Redirect(w, request, "/", 302)
-	}
-
-	er := page("login").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
