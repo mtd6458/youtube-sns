@@ -1,0 +1,25 @@
+{{ template "header" .}}
+
+<div style="display: flex">
+{{ range $n, $Item := .TagList }}
+  <div class="media border m-1 p-2" style="width: auto; height: 5%; border-radius: 25px;">
+    <div class="media-body">
+      <a href="/tag?tagId={{ $Item.ID }}"><h5 class="tag-clamp">{{ $Item.Name }}</h5></a>
+    </div>
+  </div>
+{{ end }}
+</div>
+<div class="style-scope">
+{{ range $n, $Item := .PostList }}
+  <div class="media media-content">
+    <a href="/post?pid={{ $Item.Model.ID }}">
+        <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Address }}/hq720.jpg" alt="Generic placeholder image">
+    </a>
+    <div class="media-body">
+      <h5 class="mt-0">{{ $Item.Title }}</h5>
+    </div>
+  </div>
+{{ end }}
+</div>
+
+{{ template "footer" }}
