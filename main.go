@@ -239,7 +239,7 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB, ta
 
 	post := migration.Post{
 		Address: address,
-		Message: request.PostFormValue("message"),
+		Title:   request.PostFormValue("title"),
 		UserId:  int(user.Model.ID),
 		TagId:   int(tag.Model.ID),
 	}
@@ -339,7 +339,7 @@ func tag(writer http.ResponseWriter, request *http.Request) {
 		post := migration.Post{
 			UserId:  int(user.Model.ID),
 			Address: address,
-			Message: request.PostFormValue("message"),
+			Title:   request.PostFormValue("title"),
 			TagId:   tagId,
 		}
 		db.Create(&post)

@@ -17,7 +17,7 @@ type User struct {
 type Post struct {
 	gorm.Model
 	Address		string
-	Message		string
+	Title		string
 	UserId	 	int
 	TagId 	int
 }

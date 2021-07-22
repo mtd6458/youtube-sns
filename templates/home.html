@@ -16,8 +16,8 @@
            id="address" name="address" placeholder="https://www.youtube.com/xxx">
   </div>
   <div class="form-group mt-4">
-    <label for="message" class="h6">Message:</label>
-    <input type="text" class="form-control" id="message" name="message">
+    <label for="message" class="h6">Title:</label>
+    <input type="text" class="form-control" id="title" name="title">
   </div>
   <div class="form-group mt-4">
     <label for="name2" class="h6">Tag:</label>
@@ -35,7 +35,7 @@
       <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Address }}/hq720.jpg" alt="Generic placeholder image">
     </a>
     <div class="media-body">
-      <h6 class="mt-0">{{ $Item.Message }}</h6>
+      <h6 class="mt-0">{{ $Item.Title }}</h6>
     </div>
   </div>
 {{ end }}
