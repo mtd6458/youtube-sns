@@ -1,24 +1,23 @@
-{{ template "header" .}}
-<div style="display: flex">
-{{ range $n, $Item := .TagList }}
-  <div class="media border m-1 p-2" style="width: auto; height: 5%; border-radius: 25px;">
-    <div class="media-body">
-      <a href="/tag?tagId={{ $Item.ID }}"><h5 class="tag-clamp">{{ $Item.Name }}</h5></a>
-    </div>
-  </div>
-{{ end }}
-</div>
-<div class="style-scope">
-{{ range $n, $Item := .PostList }}
-  <div class="media media-content">
-    <a href="/post?pid={{ $Item.Model.ID }}">
-        <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Address }}/hq720.jpg" alt="Generic placeholder image">
-    </a>
-    <div class="media-body">
-      <h5 class="mt-0">{{ $Item.Title }}</h5>
-    </div>
-  </div>
-{{ end }}
-</div>
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
 
-{{ template "footer" }}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- font awesome from BootstrapCDN -->
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link href="/public/app.css" rel="stylesheet">
+</head>
+<body class="home">
+<div class="container">
+  <div class="login-page clearfix">
+    <div class="login-box auth0-box before">
+      <h3>Youtube share</h3>
+      <a id="qsLoginBtn" class="btn btn-primary btn-lg btn-block" href="/login">SignIn</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
