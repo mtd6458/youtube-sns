@@ -260,14 +260,14 @@ func logout(w http.ResponseWriter, request *http.Request) {
 }
 
 // home page handler
-func HomeHandler(writer http.ResponseWriter, request *http.Request) {
+func HomeHandler(writer http.ResponseWriter, r *http.Request) {
 	user := checkLogin()
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
-	if request.Method == "POST" {
-		name := request.PostFormValue("name")
+	if r.Method == "POST" {
+		name := r.PostFormValue("name")
 
 		var tag migration.Tag
 
@@ -279,7 +279,7 @@ func HomeHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		savePostRecord(request, user, db, &tag)
+		savePostRecord(r, user, db, &tag)
 	}
 
 	var postList []migration.Post
@@ -315,8 +315,8 @@ func HomeHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB, tag *migration.Tag) {
-	address := request.PostFormValue("address")
+func savePostRecord(r *http.Request, user *migration.User, db *gorm.DB, tag *migration.Tag) {
+	address := r.PostFormValue("address")
 	address = strings.TrimSpace(address)
 
 	if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false {
@@ -341,7 +341,7 @@ func savePostRecord(request *http.Request, user *migration.User, db *gorm.DB, ta
 
 	post := migration.Post{
 		Address: address,
-		Title:   request.PostFormValue("title"),
+		Title:   r.PostFormValue("title"),
 		UserId:  int(user.Model.ID),
 		TagId:   int(tag.Model.ID),
 	}
@@ -359,15 +359,15 @@ func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migratio
 }
 
 // post page handler
-func PostHandler(writer http.ResponseWriter, request *http.Request) {
+func PostHandler(writer http.ResponseWriter, r *http.Request) {
 	user := checkLogin()
 
-	pid := request.FormValue("pid")
+	pid := r.FormValue("pid")
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
-	if request.Method == "POST" {
-		msg := request.PostFormValue("message")
+	if r.Method == "POST" {
+		msg := r.PostFormValue("message")
 		pId, _ := strconv.Atoi(pid)
 		comment := migration.Comment{
 			UserId:  int(user.Model.ID),
@@ -407,15 +407,15 @@ func PostHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 // tag page handler
-func TagHandler(writer http.ResponseWriter, request *http.Request) {
+func TagHandler(writer http.ResponseWriter, r *http.Request) {
 	user := checkLogin()
 
-	tagId := request.FormValue("tagId")
+	tagId := r.FormValue("tagId")
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
-	if request.Method == "POST" {
-		address := request.PostFormValue("address")
+	if r.Method == "POST" {
+		address := r.PostFormValue("address")
 		address = strings.TrimSpace(address)
 		if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false {
 			return
@@ -441,7 +441,7 @@ func TagHandler(writer http.ResponseWriter, request *http.Request) {
 		post := migration.Post{
 			UserId:  int(user.Model.ID),
 			Address: address,
-			Title:   request.PostFormValue("title"),
+			Title:   r.PostFormValue("title"),
 			TagId:   tagId,
 		}
 		db.Create(&post)
