@@ -248,17 +248,6 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func logout(w http.ResponseWriter, request *http.Request) {
-	user := checkLogin()
-
-	session, _ := cs.Get(request, sessionName)
-	session.Values["login"] = true
-	session.Values["account"] = user
-	session.Values["name"] = user.Name
-	session.Save(request, w)
-	http.Redirect(w, request, "/", 302)
-}
-
 // home page handler
 func HomeHandler(writer http.ResponseWriter, r *http.Request) {
 	user := checkLogin()
