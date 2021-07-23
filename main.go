@@ -48,9 +48,9 @@ func main() {
 
 	http.HandleFunc("/home", HomeHandler)
 
-	http.HandleFunc("/post", post)
+	http.HandleFunc("/post", PostHandler)
 
-	http.HandleFunc("/tag", tag)
+	http.HandleFunc("/tag", TagHandler)
 
 	http.ListenAndServe(":8080", nil)
 }
@@ -359,7 +359,7 @@ func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migratio
 }
 
 // post page handler
-func post(writer http.ResponseWriter, request *http.Request) {
+func PostHandler(writer http.ResponseWriter, request *http.Request) {
 	user := checkLogin()
 
 	pid := request.FormValue("pid")
@@ -407,7 +407,7 @@ func post(writer http.ResponseWriter, request *http.Request) {
 }
 
 // tag page handler
-func tag(writer http.ResponseWriter, request *http.Request) {
+func TagHandler(writer http.ResponseWriter, request *http.Request) {
 	user := checkLogin()
 
 	tagId := request.FormValue("tagId")
