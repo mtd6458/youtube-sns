@@ -242,7 +242,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		TagList:  tagList,
 	}
 
-	er := page("index").Execute(w, item)
+	er := page("top").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
