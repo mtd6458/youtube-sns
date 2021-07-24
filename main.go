@@ -55,16 +55,21 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-func checkLogin() *migration.User {
 
-	ac := "guest@guest.jp"
+func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
+	session, _ := app.Store.Get(r, "auth-session")
+	profile := session.Values["profile"]
+	userId := profile.(map[string]interface{})["sub"]
 
-	var user migration.User
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
-	db.Where("account = ?", ac).First(&user)
+	var user migration.User
+	db.Where("id_token = ?", userId.(string)).First(&user)
 
+	if user.ID == 0 {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
 	return &user
 }
 
@@ -83,6 +88,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+
 	// Generate random state
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
@@ -169,10 +175,30 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	session.Values["id_token"] = rawIDToken
 	session.Values["access_token"] = token.AccessToken
 	session.Values["profile"] = profile
+
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	user := checkLogin(w, r)
+
+	if user.ID == 0 {
+		db, _ := gorm.Open(dbDriver, dbName)
+		defer db.Close()
+
+		userId := profile["sub"]
+		name := profile["name"]
+
+		usr := migration.User{
+			Model:   gorm.Model{},
+			IdToken: userId.(string),
+			Name:    name.(string),
+		}
+
+		db.Create(&usr)
+		log.Println("create usr")
 	}
 
 	// Redirect to logged in page
@@ -219,7 +245,8 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Println(session.Values["profile"])
+	profile := session.Values["profile"]
+	name := profile.(map[string]interface{})["name"]
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
@@ -237,7 +264,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		TagList  []migration.Tag
 	}{
 		Title:    "Index",
-		UserName: "",
+		UserName: name.(string),
 		PostList: postList,
 		TagList:  tagList,
 	}
