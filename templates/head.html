@@ -32,6 +32,16 @@
       -webkit-line-clamp: 1;
       overflow: hidden;
     }
+
+    .user-name {
+      padding: .5rem 1rem;
+      display: inline-block;
+      font-size: 1.25rem;
+      border: 1px solid transparent;
+      position: absolute;
+      top: 5px;
+      right: 100px;
+    }
   </style>
 </head>
 </html>
@@ -45,9 +55,13 @@
         <li class="nav-item active">
           <a class="btn btn-primary btn-lg nav-link" href="/home">Home</a>
         </li>
+        <li>
+          <span class="text-light user-name">{{ .UserName }}</span>
+        </li>
+        <li style="position: absolute; top: 5px; right: 10px;">
+          <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout" href="/logout">Logout</a>
+        </li>
       </ul>
-      <span class="navbar-text text-light">{{ .UserName }}</span>
-      <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout" href="/logout">Logout</a>
     </nav>
     <div class="p-1">
 {{ end }}
