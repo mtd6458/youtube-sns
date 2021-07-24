@@ -249,8 +249,8 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // home page handler
-func HomeHandler(writer http.ResponseWriter, r *http.Request) {
-	user := checkLogin()
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	user := checkLogin(w, r)
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
@@ -298,7 +298,7 @@ func HomeHandler(writer http.ResponseWriter, r *http.Request) {
 		TagList:  tagList,
 	}
 
-	er := page("home").Execute(writer, item)
+	er := page("home").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
@@ -348,8 +348,8 @@ func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migratio
 }
 
 // post page handler
-func PostHandler(writer http.ResponseWriter, r *http.Request) {
-	user := checkLogin()
+func PostHandler(w http.ResponseWriter, r *http.Request) {
+	user := checkLogin(w, r)
 
 	pid := r.FormValue("pid")
 	db, _ := gorm.Open(dbDriver, dbName)
@@ -389,15 +389,15 @@ func PostHandler(writer http.ResponseWriter, r *http.Request) {
 		CommentJoinList: commentJoinList,
 	}
 
-	er := page("post").Execute(writer, item)
+	er := page("post").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
 }
 
 // tag page handler
-func TagHandler(writer http.ResponseWriter, r *http.Request) {
-	user := checkLogin()
+func TagHandler(w http.ResponseWriter, r *http.Request) {
+	user := checkLogin(w, r)
 
 	tagId := r.FormValue("tagId")
 	db, _ := gorm.Open(dbDriver, dbName)
@@ -456,7 +456,7 @@ func TagHandler(writer http.ResponseWriter, r *http.Request) {
 		PostList: postList,
 	}
 
-	er := page("tag").Execute(writer, item)
+	er := page("tag").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
