@@ -192,9 +192,9 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		name := profile["name"]
 
 		usr := migration.User{
-			Model:   gorm.Model{},
-			IdToken: userId.(string),
-			Name:    name.(string),
+			Model: gorm.Model{},
+			Sid:   userId.(string),
+			Name:  name.(string),
 		}
 
 		db.Create(&usr)
