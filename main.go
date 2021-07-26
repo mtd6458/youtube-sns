@@ -55,7 +55,6 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
 	session, _ := app.Store.Get(r, "auth-session")
 	profile := session.Values["profile"]
