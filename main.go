@@ -289,7 +289,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		if name != "" {
 			db.Where("name = ?", name).First(&tag)
 
-			if tag.Name == "" {
+			if tag.Model.ID == 0 {
 				saveTagRecord(name, user, db, &tag)
 			}
 		}
