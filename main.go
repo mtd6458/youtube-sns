@@ -452,6 +452,10 @@ func TagHandler(w http.ResponseWriter, r *http.Request) {
 			address = address[:strings.Index(address, "&index")]
 		}
 
+		if strings.Contains(address, "&t") {
+			address = address[:strings.Index(address, "&t")]
+		}
+
 		tagId, _ := strconv.Atoi(tagId)
 		post := migration.Post{
 			UserId:  int(user.Model.ID),
