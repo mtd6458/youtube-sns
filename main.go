@@ -365,7 +365,7 @@ func savePostRecord(r *http.Request, user *migration.User, db *gorm.DB, tag *mig
 }
 
 func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migration.Tag) {
-	tag = &migration.Tag{
+	*tag = migration.Tag{
 		UserId: int(user.Model.ID),
 		Name:   name,
 	}
