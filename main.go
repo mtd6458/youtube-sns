@@ -50,6 +50,8 @@ func main() {
 
 	http.HandleFunc("/post", PostHandler)
 
+	http.HandleFunc("/delete-post", DeletePostHandler)
+
 	http.HandleFunc("/tag", TagHandler)
 
 	http.ListenAndServe(":8080", nil)
@@ -244,6 +246,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	profile := session.Values["profile"]
 	name := profile.(map[string]interface{})["name"]
 
@@ -378,6 +381,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	user := checkLogin(w, r)
 
 	pid := r.FormValue("pid")
+
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
@@ -416,6 +420,52 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	er := page("post").Execute(w, item)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
+
+// delete post handler
+func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
+
+	session, err := app.Store.Get(r, "auth-session")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	profile := session.Values["profile"]
+	name := profile.(map[string]interface{})["name"]
+
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
+
+	pid := r.FormValue("pid")
+
+	switch r.Method {
+	case "POST":
+		db.Debug().Delete(migration.Post{}, "id = ?", pid)
+	}
+
+	var postList []migration.Post
+	var tagList []migration.Tag
+
+	db.Where("tag_id > 0").Order("created_at desc").Limit(12).Find(&postList)
+	db.Not("name", "").Order("created_at desc").Limit(12).Find(&tagList)
+
+	item := struct {
+		Title    string
+		UserName string
+		PostList []migration.Post
+		TagList  []migration.Tag
+	}{
+		Title:    "Index",
+		UserName: name.(string),
+		PostList: postList,
+		TagList:  tagList,
+	}
+
+	er := page("top").Execute(w, item)
 	if er != nil {
 		log.Fatal(er)
 	}
