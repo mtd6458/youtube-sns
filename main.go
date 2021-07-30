@@ -196,7 +196,7 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 			Name:  name.(string),
 		}
 
-		db.Create(&usr)
+		db.Debug().Create(&usr)
 		log.Println("create usr")
 	}
 
@@ -361,7 +361,7 @@ func savePostRecord(r *http.Request, user *migration.User, db *gorm.DB, tag *mig
 		TagId:   int(tag.Model.ID),
 	}
 
-	db.Create(&post)
+	db.Debug().Create(&post)
 }
 
 func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migration.Tag) {
@@ -370,7 +370,7 @@ func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migratio
 		Name:   name,
 	}
 
-	db.Create(&tag)
+	db.Debug().Create(&tag)
 }
 
 // post page handler
@@ -389,7 +389,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			PostId:  pId,
 			Message: msg,
 		}
-		db.Create(&comment)
+		db.Debug().Create(&comment)
 	}
 
 	var post migration.Post
@@ -463,7 +463,7 @@ func TagHandler(w http.ResponseWriter, r *http.Request) {
 			Title:   r.PostFormValue("title"),
 			TagId:   tagId,
 		}
-		db.Create(&post)
+		db.Debug().Create(&post)
 	}
 
 	var tag migration.Tag
