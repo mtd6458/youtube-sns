@@ -58,13 +58,13 @@ func main() {
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
 	session, _ := app.Store.Get(r, "auth-session")
 	profile := session.Values["profile"]
-	userId := profile.(map[string]interface{})["sub"]
+	sid := profile.(map[string]interface{})["sub"]
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
 	var user migration.User
-	db.Where("id_token = ?", userId.(string)).First(&user)
+	db.Where("sid = ?", sid.(string)).First(&user)
 
 	if user.ID == 0 {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
