@@ -256,7 +256,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	var postList []migration.Post
 	var tagList []migration.Tag
 
-	db.Where("tag_id > 0").Order("created_at desc").Limit(12).Find(&postList)
+	db.Order("created_at desc").Limit(12).Find(&postList)
 	db.Not("name", "").Order("created_at desc").Limit(12).Find(&tagList)
 
 	item := struct {
