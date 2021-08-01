@@ -265,7 +265,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		PostList []migration.Post
 		TagList  []migration.Tag
 	}{
-		Title:    "Index",
+		Title:    "Top",
 		UserName: name.(string),
 		PostList: postList,
 		TagList:  tagList,
