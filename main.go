@@ -256,7 +256,14 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	var postList []migration.Post
 	var tagList []migration.Tag
 
-	db.Order("created_at desc").Limit(24).Find(&postList)
+	// TODO
+	db.Table("posts").
+	  Select("posts.*, users.id, users.name").
+	  Joins("join users on users.id = posts.user_id").
+	  Order("created_at desc").
+	  Limit(24).
+	  Find(&postList)
+
 	db.Not("name", "").Order("created_at desc").Limit(12).Find(&tagList)
 
 	item := struct {
