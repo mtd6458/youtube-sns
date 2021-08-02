@@ -68,6 +68,8 @@ func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
 	defer db.Close()
 
 	var user migration.User
+
+	sid := profile.(map[string]interface{})["sub"]
 	db.Where("sid = ?", sid.(string)).First(&user)
 
 	if user.ID == 0 {
