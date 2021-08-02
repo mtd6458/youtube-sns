@@ -268,7 +268,10 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		Limit(24).
 		Find(&postList)
 
-	db.Not("name", "").Order("created_at desc").Limit(12).Find(&tagList)
+	db.Not("name", "").
+		Order("created_at desc").
+		Limit(12).
+		Find(&tagList)
 
 	item := struct {
 		Title    string
