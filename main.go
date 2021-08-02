@@ -262,11 +262,11 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO
 	db.Table("posts").
-	  Select("posts.*, users.id, users.name").
-	  Joins("join users on users.id = posts.user_id").
-	  Order("created_at desc").
-	  Limit(24).
-	  Find(&postList)
+		Select("posts.*, users.id, users.name").
+		Joins("join users on users.id = posts.user_id").
+		Order("created_at desc").
+		Limit(24).
+		Find(&postList)
 
 	db.Not("name", "").Order("created_at desc").Limit(12).Find(&tagList)
 
@@ -456,7 +456,7 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 		db.Debug().Delete(migration.Post{}, "id = ?", pid)
 	}
 
-  http.Redirect(w, r, "top", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "top", http.StatusTemporaryRedirect)
 }
 
 // tag page handler
