@@ -60,7 +60,9 @@ func main() {
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
 	session, _ := app.Store.Get(r, "auth-session")
 	profile := session.Values["profile"]
-	sid := profile.(map[string]interface{})["sub"]
+	if profile == nil {
+		return nil
+	}
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
@@ -184,6 +186,10 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
 	if user.ID == 0 {
 		db, _ := gorm.Open(dbDriver, dbName)
@@ -241,14 +247,12 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // top page handler
 func TopHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := app.Store.Get(r, "auth-session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
-	profile := session.Values["profile"]
-	name := profile.(map[string]interface{})["name"]
+	name := user.Name
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
@@ -273,7 +277,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 		TagList  []migration.Tag
 	}{
 		Title:    "Top",
-		UserName: name.(string),
+		UserName: name,
 		PostList: postList,
 		TagList:  tagList,
 	}
@@ -287,6 +291,10 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 // home page handler
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
@@ -386,6 +394,10 @@ func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migratio
 // post page handler
 func PostHandler(w http.ResponseWriter, r *http.Request) {
 	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
 	pid := r.FormValue("pid")
 
@@ -450,6 +462,10 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 // tag page handler
 func TagHandler(w http.ResponseWriter, r *http.Request) {
 	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
 	tagId := r.FormValue("tagId")
 	db, _ := gorm.Open(dbDriver, dbName)
