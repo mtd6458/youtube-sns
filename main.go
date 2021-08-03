@@ -267,7 +267,6 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	var postList []Post
 	var tagList []migration.Tag
 
-	// TODO
 	db.Table("posts").
 		Select("posts.*, users.name").
 		Joins("join users on users.id = posts.user_id").
