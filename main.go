@@ -259,15 +259,20 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
-	var postList []migration.Post
+	type Post struct {
+		migration.Post
+		migration.User
+	}
+
+	var postList []Post
 	var tagList []migration.Tag
 
 	// TODO
 	db.Table("posts").
-		Select("posts.*, users.id, users.name").
+		Select("posts.*, users.name").
 		Joins("join users on users.id = posts.user_id").
 		Order("created_at desc").
-		Limit(24).
+		Limit(50).
 		Find(&postList)
 
 	db.Not("name", "").
@@ -278,7 +283,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	item := struct {
 		Title    string
 		UserName string
-		PostList []migration.Post
+		PostList []Post
 		TagList  []migration.Tag
 	}{
 		Title:    "Top",

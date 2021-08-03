@@ -12,11 +12,12 @@
 <div class="style-scope">
 {{ range $n, $Item := .PostList }}
   <div class="media media-content">
-    <a href="/post?pid={{ $Item.Model.ID }}">
-        <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Address }}/hqdefault.jpg" alt="Generic placeholder image">
+    <a href="/post?pid={{ $Item.Post.Model.ID }}">
+        <img class="thumbnail" src="https://i.ytimg.com/vi/{{ $Item.Post.Address }}/hqdefault.jpg" alt="Generic placeholder image">
     </a>
     <div class="media-body">
-      <h5 class="mt-0">{{ $Item.Title }}</h5>
+      <h5 class="mt-0">{{ $Item.Post.Title }}</h5>
+      <p>{{ $Item.User.Name }}</p>
     </div>
   </div>
 {{ end }}
