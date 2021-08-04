@@ -1,0 +1,10 @@
+{{ template "header" . }}
+<h3>ユーザ名を編集</h3>
+<form method="post" action="/user">
+  <div class="form-group mt-4">
+    <label for="message" class="h6">Name:</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="{{ .UserName }}">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Save</button>
+</form>
+{{ template "footer" }}
