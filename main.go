@@ -54,6 +54,12 @@ func main() {
 
 	http.HandleFunc("/tag", TagHandler)
 
+	http.HandleFunc("/profile", ProfileHandler)
+
+	http.HandleFunc("/profile-edit", ProfileEditHandler)
+
+	http.HandleFunc("/user", UserHandler)
+
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -542,3 +548,68 @@ func TagHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(er)
 	}
 }
+
+func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+  user := checkLogin(w, r)
+  if user == nil {
+    http.Redirect(w, r, "/", http.StatusSeeOther)
+    return
+  }
+
+  item := struct {
+    Title string
+    UserName string
+  }{
+    Title: "プロフィール",
+    UserName: user.Name,
+  }
+
+  er := page("profile").Execute(w, item)
+  if er != nil {
+    log.Fatal(er)
+  }
+}
+
+func ProfileEditHandler(w http.ResponseWriter, r *http.Request) {
+  user := checkLogin(w, r)
+  if user == nil {
+    http.Redirect(w, r, "/", http.StatusSeeOther)
+    return
+  }
+
+  item := struct {
+    Title string
+    UserName string
+    UserId uint
+  }{
+    Title: "プロフィール編集",
+    UserName: user.Name,
+    UserId: user.Model.ID,
+  }
+
+  er := page("profile-edit").Execute(w, item)
+  if er != nil {
+    log.Fatal(er)
+  }
+}
+
+func UserHandler(w http.ResponseWriter, r *http.Request) {
+  user := checkLogin(w, r)
+  if user == nil {
+    http.Redirect(w, r, "/", http.StatusSeeOther)
+    return
+  }
+
+  name := r.PostFormValue("name")
+
+  db, _ := gorm.Open(dbDriver, dbName)
+  defer db.Close()
+
+  if r.Method == "POST" && name != "" {
+    db.Debug().Model(&user).Update("name", name)
+  }
+
+  http.Redirect(w, r, "/profile", http.StatusSeeOther)
+}
+
+
