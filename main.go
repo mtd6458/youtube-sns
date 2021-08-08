@@ -29,7 +29,17 @@ var sessionName = "ytboard-session"
 var cs = sessions.NewCookieStore([]byte("secret-key-1234"))
 
 func main() {
-	app.Init()
+	if err := Main(); err != nil {
+		v := errors.AsAppError(err)
+		if v == nil {
+			v = errors.AsAppError(errors.SystemDefault.Wrap(err, "Unknown error"))
+		}
+		fmt.Printf("%+v", v) // or ログ送信等
+	}
+}
+
+func Main() errors.AppError {
+	//app.Init()
 
 	log.Print("Server listening on http://localhost:8080/")
 
