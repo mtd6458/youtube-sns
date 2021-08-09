@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/youtube-sns/errors"
 	"github.com/youtube-sns/migration"
 	"html/template"
 	"log"
@@ -32,14 +33,14 @@ func main() {
 	if err := Main(); err != nil {
 		v := errors.AsAppError(err)
 		if v == nil {
-			v = errors.AsAppError(errors.SystemDefault.Wrap(err, "Unknown error"))
+			v = errors.AsAppError(errors.Wrap(err))
 		}
 		fmt.Printf("%+v", v) // or ログ送信等
 	}
 }
 
 func Main() errors.AppError {
-	//app.Init()
+	app.Init()
 
 	log.Print("Server listening on http://localhost:8080/")
 
@@ -71,6 +72,13 @@ func Main() errors.AppError {
 	http.HandleFunc("/user", UserHandler)
 
 	http.ListenAndServe(":8080", nil)
+
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		return errors.Wrap(err)
+	}
+
+	return nil
+}
 }
 
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
