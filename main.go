@@ -79,7 +79,6 @@ func Main() errors.AppError {
 
 	return nil
 }
-}
 
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
 	session, _ := app.Store.Get(r, "auth-session")
