@@ -25,5 +25,5 @@ func Migrate() {
 	// DB構造体からマイグレーション実行用のメソッドを呼び出す
 	// 引数にはマイグレーションするモデルの構造体の値をポインタで渡す。
 	// いくつでも指定できる。
-	db.AutoMigrate(&User{}, &Tag{}, &Post{}, &Comment{})
+	db.AutoMigrate(&User{}, &Tag{}, &Post{}, &Comment{}, &TagPost{})
 }

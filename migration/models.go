@@ -17,7 +17,6 @@ type Post struct {
 	Address string
 	Title   string
 	UserId  int
-	TagId   int
 }
 
 // Tag model.
@@ -40,4 +39,11 @@ type CommentJoin struct {
 	Comment
 	User
 	Post
+}
+
+// Tag join model.
+type TagPost struct {
+  gorm.Model
+  TagId int
+  PostId int
 }
