@@ -558,34 +558,57 @@ func TagHandler(w http.ResponseWriter, r *http.Request) {
 			address = address[:strings.Index(address, "&t")]
 		}
 
-		tagId, _ := strconv.Atoi(tagId)
 		post := migration.Post{
 			UserId:  int(user.Model.ID),
 			Address: address,
 			Title:   r.PostFormValue("title"),
-			TagId:   tagId,
 		}
+
 		db.Debug().Create(&post)
+
+		tagId, _ := strconv.Atoi(tagId)
+		tagPost := migration.TagPost{
+			TagId:  tagId,
+			PostId: int(post.ID),
+		}
+
+		db.Debug().Create(&tagPost)
 	}
 
-	var tag migration.Tag
-	var postList []migration.Post
+	type PostJoinTag struct {
+		migration.Post
+		migration.Tag
+	}
 
-	db.Where("id = ?", tagId).First(&tag)
-	db.Order("created_at desc").Model(&tag).Related(&postList)
+	var postJoinList []PostJoinTag
+
+	db.Debug().Table("posts").
+		Select("posts.*, tags.*").
+		Joins("left join tag_posts on posts.id = tag_posts.post_id").
+		Joins("left join tags on tag_posts.tag_id = tags.id").
+		Where("tags.id = ?", tagId).
+		Order("created_at desc").
+		Find(&postJoinList)
+
+	log.Println(len(postJoinList))
+
+	tag := migration.Tag{}
+	if len(postJoinList) > 0 {
+		tag = postJoinList[0].Tag
+	}
 
 	item := struct {
-		Title    string
-		UserName string
-		Message  string
-		Tag      migration.Tag
-		PostList []migration.Post
+		Title           string
+		UserName        string
+		Message         string
+		Tag             migration.Tag
+		PostJoinTagList []PostJoinTag
 	}{
-		Title:    "Tag",
-		UserName: user.Name,
-		Message:  "Tag id=" + tagId,
-		Tag:      tag,
-		PostList: postList,
+		Title:           "Tag",
+		UserName:        user.Name,
+		Message:         "Tag id=" + tagId,
+		Tag:             tag,
+		PostJoinTagList: postJoinList,
 	}
 
 	er := page("tag").Execute(w, item)

@@ -2,7 +2,7 @@
 
 <h4 class="mt-4">{{ .Tag.Name }} </h4>
 
-<form method="post" action="/tag?tagId={{ .Tag.Model.ID }}">
+<form method="post" action="/tag?tagId={{ .Tag.ID }}">
   <div class="form-group mt-4">
     <label for="address" class="h6">Youtube share address:</label>
     <input type="text" class="form-control"
@@ -15,14 +15,15 @@
   <button type="submit" class="btn btn-primary mb-2">Post group.</button>
 </form>
 
-{{ range $n, $Item := .PostList }}
+{{ range $n, $PostJoinTag := .PostJoinTagList }}
   <div class="media border m-1 p-2">
-    <a href="/post?pid={{ $Item.Model.ID }}">
-      <img class="mr-3" style="width: 168px" src="https://i.ytimg.com/vi/{{ $Item.Address }}/hqdefault.jpg"
+    <a href="/post?pid={{ $PostJoinTag.Post.ID }}">
+      <img class="mr-3" style="width: 168px" src="https://i.ytimg.com/vi/{{ $PostJoinTag.Address }}/hqdefault.jpg"
            alt="Generic placeholder image">
     </a>
     <div class="media-body">
-      <h5 class="mt-0">{{ $Item.Title }}</h5>
+      <h5 class="mt-0">{{ $PostJoinTag.Title }}</h5>
+      <p>{{ $PostJoinTag.Tag.Name }}</p>
     </div>
   </div>
 {{ end }}
