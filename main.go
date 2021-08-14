@@ -466,8 +466,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	db.Debug().Table("posts").
 		Select("posts.*, tags.id, tags.name").
-		Joins("join tag_posts on posts.id = tag_posts.post_id").
-		Joins("join tags on tag_posts.tag_id = tags.id").
+		Joins("left join tag_posts on posts.id = tag_posts.post_id").
+		Joins("left join tags on tag_posts.tag_id = tags.id").
 		Where("posts.id = ?", pid).
 		Order("created_at desc").
 		Find(&postJoinTagList)
