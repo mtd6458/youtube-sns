@@ -447,26 +447,45 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		db.Debug().Create(&comment)
 	}
 
-	var post migration.Post
+	type PostJoinTag struct {
+		migration.Post
+		migration.Tag
+	}
+
+	var postJoinTagList []PostJoinTag
 	var commentJoinList []migration.CommentJoin
 
-	db.Where("id = ?", pid).First(&post)
-	db.Table("comments").
+	db.Debug().Table("posts").
+		Select("posts.*, tags.id, tags.name").
+		Joins("join tag_posts on posts.id = tag_posts.post_id").
+		Joins("join tags on tag_posts.tag_id = tags.id").
+		Where("posts.id = ?", pid).
+		Order("created_at desc").
+		Find(&postJoinTagList)
+
+	db.Debug().Table("comments").
 		Select("comments.*, users.id, users.name").
 		Joins("join users on users.id = comments.user_id").
 		Where("comments.post_id = ?", pid).
 		Order("created_at desc").
 		Find(&commentJoinList)
 
+	tagList := make([]migration.Tag, len(postJoinTagList))
+	for i, postJoinTag := range postJoinTagList {
+		tagList[i] = postJoinTag.Tag
+	}
+
 	item := struct {
 		Title           string
 		UserName        string
 		Post            migration.Post
+		TagList         []migration.Tag
 		CommentJoinList []migration.CommentJoin
 	}{
 		Title:           "Post",
 		UserName:        user.Name,
-		Post:            post,
+		Post:            postJoinTagList[0].Post,
+		TagList:         tagList,
 		CommentJoinList: commentJoinList,
 	}
 
