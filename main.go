@@ -290,7 +290,7 @@ func TopHandler(w http.ResponseWriter, r *http.Request) {
 	var postList []Post
 	var tagList []migration.Tag
 
-	db.Table("posts").
+	db.Debug().Table("posts").
 		Select("posts.*, users.name").
 		Joins("join users on users.id = posts.user_id").
 		Order("created_at desc").
