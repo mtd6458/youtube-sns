@@ -332,19 +332,27 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	if r.Method == "POST" {
-		name := r.PostFormValue("name")
+		tagName := r.PostFormValue("tag-name")
 
 		var tag migration.Tag
 
-		if name != "" {
-			db.Where("name = ?", name).First(&tag)
+		if tagName != "" {
+			db.Where("name = ?", tagName).First(&tag)
 
 			if tag.Model.ID == 0 {
-				saveTagRecord(name, user, db, &tag)
+				saveTagRecord(tagName, user, db, &tag)
 			}
 		}
 
-		savePostRecord(r, user, db, &tag)
+		post, ok := savePostRecord(r, user, db)
+
+		if tagName != "" && ok {
+			tagPost := migration.TagPost{
+				TagId:  int(tag.Model.ID),
+				PostId: int(post.Model.ID),
+			}
+			db.Debug().Create(&tagPost)
+		}
 	}
 
 	var postList []migration.Post
@@ -380,12 +388,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func savePostRecord(r *http.Request, user *migration.User, db *gorm.DB, tag *migration.Tag) {
+func savePostRecord(r *http.Request, user *migration.User, db *gorm.DB) (migration.Post, bool) {
 	address := r.PostFormValue("address")
 	address = strings.TrimSpace(address)
 
 	if address == "" || strings.HasPrefix(address, "https://www.youtube.com/") == false {
-		return
+		return migration.Post{}, false
 	}
 
 	if strings.HasPrefix(address, "https://www.youtube.com/watch?v=") {
@@ -408,16 +416,17 @@ func savePostRecord(r *http.Request, user *migration.User, db *gorm.DB, tag *mig
 		Address: address,
 		Title:   r.PostFormValue("title"),
 		UserId:  int(user.Model.ID),
-		TagId:   int(tag.Model.ID),
 	}
 
 	db.Debug().Create(&post)
+
+	return post, true
 }
 
-func saveTagRecord(name string, user *migration.User, db *gorm.DB, tag *migration.Tag) {
+func saveTagRecord(tagName string, user *migration.User, db *gorm.DB, tag *migration.Tag) {
 	*tag = migration.Tag{
 		UserId: int(user.Model.ID),
-		Name:   name,
+		Name:   tagName,
 	}
 
 	db.Debug().Create(&tag)
