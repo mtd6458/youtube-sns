@@ -1,6 +1,6 @@
 {{ template "header" . }}
 <h3>ユーザ名を編集</h3>
-<form method="post" action="/user">
+<form method="post" action="/profile-edit">
   <div class="form-group mt-4">
     <label for="message" class="h6">Name:</label>
     <input type="text" class="form-control" id="name" name="name" placeholder="{{ .UserName }}">

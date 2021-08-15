@@ -645,6 +645,20 @@ func ProfileEditHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	db, _ := gorm.Open(dbDriver, dbName)
+	defer db.Close()
+
+	name := r.PostFormValue("name")
+	if r.Method == "POST" {
+		if name != "" {
+			db, _ := gorm.Open(dbDriver, dbName)
+			defer db.Close()
+
+			db.Debug().Model(&user).Update("name", name)
+		}
+		http.Redirect(w, r, "/profile", http.StatusSeeOther)
+	}
+
 	item := struct {
 		Title    string
 		UserName string
@@ -659,23 +673,4 @@ func ProfileEditHandler(w http.ResponseWriter, r *http.Request) {
 	if er != nil {
 		log.Fatal(er)
 	}
-}
-
-func UserHandler(w http.ResponseWriter, r *http.Request) {
-	user := checkLogin(w, r)
-	if user == nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	name := r.PostFormValue("name")
-
-	db, _ := gorm.Open(dbDriver, dbName)
-	defer db.Close()
-
-	if r.Method == "POST" && name != "" {
-		db.Debug().Model(&user).Update("name", name)
-	}
-
-	http.Redirect(w, r, "/profile", http.StatusSeeOther)
 }
