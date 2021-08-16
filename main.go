@@ -221,14 +221,12 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		userId := profile["sub"]
 		name := profile["name"]
 
-		usr := migration.User{
-			Model: gorm.Model{},
+		user := migration.User{
 			Sid:   userId.(string),
 			Name:  name.(string),
 		}
 
-		db.Debug().Create(&usr)
-		log.Println("create usr")
+		db.Debug().Create(&user)
 	}
 
 	// Redirect to logged in page
