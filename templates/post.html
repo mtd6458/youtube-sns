@@ -12,7 +12,9 @@
     <div class="card-body">
       <h5 class="mt-0">{{ .Post.Title }}</h5>
       {{ range $n, $tag := .TagList }}
-        <a href="/tag?tagId={{ $tag.ID }}">{{ $tag.Name }}</a>
+        {{ if ne $tag.ID 0 }}
+          <a href="/tag?tagId={{ $tag.ID }}">#{{ $tag.Name }}</a>
+        {{ end }}
       {{ end }}
       <button type="submit" class="btn btn-primary mb-2">削除</button>
     </div>
