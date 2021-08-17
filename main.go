@@ -504,6 +504,12 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 // delete post handler
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
+  user := checkLogin(w, r)
+  if user == nil {
+    http.Redirect(w, r, "/", http.StatusSeeOther)
+    return
+  }
+
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
@@ -511,7 +517,12 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST":
-		db.Debug().Delete(migration.Post{}, "id = ?", pid)
+	  var post migration.Post
+	  db.Debug().Where("id = ?", pid).First(&post)
+
+    if post.UserId == int(user.ID) {
+      db.Debug().Delete(migration.Post{}, "id = ?", pid)
+    }
 	}
 
 	http.Redirect(w, r, "top", http.StatusTemporaryRedirect)
