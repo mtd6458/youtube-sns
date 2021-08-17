@@ -332,7 +332,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 		var tag migration.Tag
 
-		if tagName != "" {
+		if len(tagName) > 0 {
 			db.Where("name = ?", tagName).First(&tag)
 
 			if tag.Model.ID == 0 {
@@ -342,7 +342,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 		post, ok := savePostRecord(r, user, db)
 
-		if tagName != "" && ok {
+		if len(tagName) > 0 && ok {
 			tagPost := migration.TagPost{
 				TagId:  int(tag.Model.ID),
 				PostId: int(post.Model.ID),
