@@ -16,7 +16,9 @@
           <a href="/tag?tagId={{ $tag.ID }}">#{{ $tag.Name }}</a>
         {{ end }}
       {{ end }}
-      <button type="submit" class="btn btn-primary mb-2">削除</button>
+      {{ if .IsDisplayDeleteBtn}}
+        <button type="submit" class="btn btn-primary mb-2">削除</button>
+      {{ end }}
     </div>
   </div>
 </form>

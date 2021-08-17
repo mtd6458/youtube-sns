@@ -484,12 +484,14 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		Title           string
 		UserName        string
 		Post            migration.Post
+		IsDisplayDeleteBtn bool
 		TagList         []migration.Tag
 		CommentJoinList []migration.CommentJoin
 	}{
 		Title:           "Post",
 		UserName:        user.Name,
 		Post:            postJoinTagList[0].Post,
+		IsDisplayDeleteBtn: int(user.ID) == postJoinTagList[0].Post.UserId,
 		TagList:         tagList,
 		CommentJoinList: commentJoinList,
 	}
