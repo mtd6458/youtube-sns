@@ -16,7 +16,8 @@
           <a href="/tag?tagId={{ $tag.ID }}">#{{ $tag.Name }}</a>
         {{ end }}
       {{ end }}
-      {{ if .IsDisplayDeleteBtn}}
+      {{ if .IsMyPost}}
+        <a href="/post-edit?pid={{ .Post.ID }}" class="btn btn-primary mb-2">編集</a>
         <button type="submit" class="btn btn-primary mb-2">削除</button>
       {{ end }}
     </div>
