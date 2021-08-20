@@ -48,25 +48,15 @@ func Main() errors.AppError {
 	 * routing
 	 */
 	http.HandleFunc("/", IndexHandler)
-
 	http.HandleFunc("/login", LoginHandler)
-
 	http.HandleFunc("/callback", CallbackHandler)
-
 	http.HandleFunc("/logout", LogoutHandler)
-
 	http.HandleFunc("/top", TopHandler)
-
 	http.HandleFunc("/home", HomeHandler)
-
 	http.HandleFunc("/post", PostHandler)
-
 	http.HandleFunc("/delete-post", DeletePostHandler)
-
 	http.HandleFunc("/tag", TagHandler)
-
 	http.HandleFunc("/profile", ProfileHandler)
-
 	http.HandleFunc("/profile-edit", ProfileEditHandler)
 
 	http.ListenAndServe(":8080", nil)
