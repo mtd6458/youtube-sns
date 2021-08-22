@@ -1,5 +1,4 @@
 {{ template "header" .}}
-
 <form method="post" action="/delete-post?pid={{ .Post.ID }}">
   <div class="card m-1 p-2 text-center">
     <div>
@@ -18,9 +17,18 @@
       {{ end }}
       {{ if .IsMyPost}}
         <a href="/post-edit?pid={{ .Post.ID }}" class="btn btn-primary mb-2">編集</a>
-        <button type="submit" class="btn btn-primary mb-2">削除</button>
+        <button id="js-show-popup" type="button" class="btn btn-primary mb-2">削除</button>
       {{ end }}
     </div>
+  </div>
+
+  <div class="popup" id="js-popup">
+    <div class="popup-inner">
+      <div class="close-btn" id="js-close-btn"><i class="fas fa-times"></i></div>
+      <p>削除します？</p>
+      <button type="submit" class="btn btn-primary mb-2">削除</button>
+    </div>
+    <div class="black-background" id="js-black-bg"></div>
   </div>
 </form>
 
@@ -41,5 +49,25 @@
   </div>
 {{ end }}
 
+<script>
+  function popupImage() {
+    var popup = document.getElementById('js-popup');
+    if(!popup) return;
 
+    var blackBg = document.getElementById('js-black-bg');
+    var closeBtn = document.getElementById('js-close-btn');
+    var showBtn = document.getElementById('js-show-popup');
+
+    closePopUp(blackBg);
+    closePopUp(closeBtn);
+    closePopUp(showBtn);
+    function closePopUp(elem) {
+      if(!elem) return;
+        elem.addEventListener('click', function() {
+        popup.classList.toggle('is-show');
+      });
+    }
+  }
+  popupImage();
+</script>
 {{ template "footer" }}
