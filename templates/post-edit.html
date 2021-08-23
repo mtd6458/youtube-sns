@@ -1,24 +1,32 @@
 {{ template "header" .}}
 
-<form method="post" action="/post-edit?pid={{ .Post.ID }}">
-  <div class="card m-1 p-2 text-center">
-    <div>
-      <iframe width="100%" height="600px" src="https://www.youtube.com/embed/{{ .Post.Address }}"
-              frameborder="0"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen>
-      </iframe>
-    </div>
-    <div class="card-body">
-      <h5 class="mt-0">{{ .Post.Title }}</h5>
-      {{ range $n, $tag := .TagList }}
-        {{ if ne $tag.ID 0 }}
+<div class="card m-1 p-2 text-center">
+  <div>
+    <iframe width="100%" height="600px" src="https://www.youtube.com/embed/{{ .Post.Address }}"
+      frameborder="0"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <form method="post" action="/post-edit?pid={{ .Post.ID }}">
+    <div class="card-body" style="text-align: left">
+      <div class="form-group mt-6">
+        <label for="title" class="h6">Title:</label>
+        <input class="form-control" name="title" value="{{ .Post.Title }}" />
+      </div>
+      <div class="form-group mt-6">
+        <label for="tag-name" class="h6">Tag:</label>
+        {{ range $n, $tag := .TagList }}
           <input class="form-control" id="tag-name" name="tag-name" value="{{ $tag.Name }}" />
         {{ end }}
-      {{ end }}
+      </div>
+
+      <button type="submit" class="btn btn-primary mb-2">Save</button>
     </div>
-  </div>
-</form>
+  </form>
+</div>
+
 
 <h4 class="mt-4">Comments.</h4>
 {{ range $n, $Item := .CommentJoinList }}
