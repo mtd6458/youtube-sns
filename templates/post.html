@@ -44,7 +44,8 @@
 {{ range $n, $Item := .CommentJoinList }}
   <div class="media m-1 p-1">
     <div class="media-body">
-      <h6 class="mt-0">{{ $Item.Name }} : {{ $Item.Comment.Message }}</h6>
+      <h6 class="mt-0 font-weight-bold">{{ $Item.Name }}</h6>
+      <p>{{ $Item.Comment.Message }}</p>
     </div>
   </div>
 {{ end }}
