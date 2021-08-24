@@ -492,17 +492,76 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// delete post handler
-func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
-  user := checkLogin(w, r)
-  if user == nil {
-    http.Redirect(w, r, "/", http.StatusSeeOther)
-    return
-  }
+func PostEditHandler(w http.ResponseWriter, r *http.Request) {
+	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	pid := r.FormValue("pid")
 
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
+	switch r.Method {
+	case "POST":
+		title := r.PostFormValue("title")
+		post := migration.Post{
+			Title: title,
+		}
+		db.Debug().Model(&post).Where("id = ?", pid).Update(&post)
+		http.Redirect(w, r, "/post?pid="+pid, http.StatusSeeOther)
+		return
+	}
+
+	type PostJoinTag struct {
+		migration.Post
+		migration.Tag
+	}
+
+	var postJoinTagList []PostJoinTag
+	var commentJoinList []migration.CommentJoin
+
+	db.Debug().Table("posts").
+		Select("posts.*, tags.id, tags.name").
+		Joins("left join tag_posts on posts.id = tag_posts.post_id").
+		Joins("left join tags on tag_posts.tag_id = tags.id").
+		Where("posts.id = ?", pid).
+		Order("created_at desc").
+		Find(&postJoinTagList)
+
+	db.Debug().Table("comments").
+		Select("comments.*, users.id, users.name").
+		Joins("join users on users.id = comments.user_id").
+		Where("comments.post_id = ?", pid).
+		Order("created_at desc").
+		Find(&commentJoinList)
+
+	tagList := make([]migration.Tag, len(postJoinTagList))
+	for i, postJoinTag := range postJoinTagList {
+		tagList[i] = postJoinTag.Tag
+	}
+
+	item := struct {
+		Title           string
+		UserName        string
+		Post            migration.Post
+		TagList         []migration.Tag
+		CommentJoinList []migration.CommentJoin
+	}{
+		Title:           "Post",
+		UserName:        user.Name,
+		Post:            postJoinTagList[0].Post,
+		TagList:         tagList,
+		CommentJoinList: commentJoinList,
+	}
+
+	er := page("post-edit").Execute(w, item)
+	if er != nil {
+		log.Fatal(er)
+	}
+}
 	pid := r.FormValue("pid")
 
 	switch r.Method {
