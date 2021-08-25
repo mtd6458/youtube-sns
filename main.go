@@ -30,16 +30,6 @@ var sessionName = "ytboard-session"
 var cs = sessions.NewCookieStore([]byte("secret-key-1234"))
 
 func main() {
-	if err := Main(); err != nil {
-		v := errors.AsAppError(err)
-		if v == nil {
-			v = errors.AsAppError(errors.Wrap(err))
-		}
-		fmt.Printf("%+v", v) // or ログ送信等
-	}
-}
-
-func Main() errors.AppError {
 	app.Init()
 
 	log.Print("Server listening on http://localhost:8080/")
@@ -47,25 +37,6 @@ func Main() errors.AppError {
 	/**
 	 * routing
 	 */
-	http.HandleFunc("/", IndexHandler)
-	http.HandleFunc("/login", LoginHandler)
-	http.HandleFunc("/callback", CallbackHandler)
-	http.HandleFunc("/logout", LogoutHandler)
-	http.HandleFunc("/top", TopHandler)
-	http.HandleFunc("/home", HomeHandler)
-	http.HandleFunc("/post", PostHandler)
-	http.HandleFunc("/delete-post", DeletePostHandler)
-	http.HandleFunc("/tag", TagHandler)
-	http.HandleFunc("/profile", ProfileHandler)
-	http.HandleFunc("/profile-edit", ProfileEditHandler)
-
-	http.ListenAndServe(":8080", nil)
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		return errors.Wrap(err)
-	}
-
-	return nil
 }
 
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
