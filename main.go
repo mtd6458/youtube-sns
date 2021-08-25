@@ -4,12 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/coreos/go-oidc"
-	"github.com/gorilla/sessions"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/youtube-sns/errors"
-	"github.com/youtube-sns/migration"
 	"html/template"
 	"log"
 	"net/http"
@@ -18,8 +12,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/codegangsta/negroni"
+	"github.com/coreos/go-oidc"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/youtube-sns/migration"
+
 	"app"
 	"auth"
+	"middlewares"
 )
 
 // db variable.
@@ -37,6 +40,31 @@ func main() {
 	/**
 	 * routing
 	 */
+	r := mux.NewRouter()
+
+	r.HandleFunc("/", IndexHandler)
+	r.HandleFunc("/login", LoginHandler)
+	r.HandleFunc("/callback", CallbackHandler)
+	r.HandleFunc("/logout", LogoutHandler)
+	r.Handle("/top", negroni.New(
+		negroni.HandlerFunc(middlewares.IsAuthenticated),
+		negroni.Wrap(http.HandlerFunc(TopHandler)),
+	))
+	r.HandleFunc("/home", HomeHandler)
+	r.HandleFunc("/post", PostHandler)
+	r.HandleFunc("/post-edit", PostEditHandler)
+	r.HandleFunc("/delete-post", DeletePostHandler)
+	r.HandleFunc("/tag", TagHandler)
+	r.HandleFunc("/profile", ProfileHandler)
+	r.HandleFunc("/profile-edit", ProfileEditHandler)
+	r.HandleFunc("/migrate", func(writer http.ResponseWriter, request *http.Request) {
+		migration.Migrate()
+	})
+
+	fileServeHandler := http.FileServer(http.Dir("public/"))
+	http.Handle("/public/", http.StripPrefix("/public/", fileServeHandler))
+	http.Handle("/", r)
+	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }
 
 func checkLogin(w http.ResponseWriter, r *http.Request) *migration.User {
