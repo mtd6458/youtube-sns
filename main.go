@@ -121,7 +121,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	session.Values["state"] = state
 	err = session.Save(r, w)
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -206,7 +205,6 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	if user.ID == 0 {
 		db, _ := gorm.Open(dbDriver, dbName)
 		defer db.Close()
-
 		userId := profile["sub"]
 		name := profile["name"]
 
