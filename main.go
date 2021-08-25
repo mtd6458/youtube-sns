@@ -571,7 +571,7 @@ func PostEditHandler(w http.ResponseWriter, r *http.Request) {
     }
 	}
 
-	http.Redirect(w, r, "top", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "home", http.StatusTemporaryRedirect)
 }
 
 // tag page handler
