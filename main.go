@@ -209,8 +209,8 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 		name := profile["name"]
 
 		user := migration.User{
-			Sid:   userId.(string),
-			Name:  name.(string),
+			Sid:  userId.(string),
+			Name: name.(string),
 		}
 
 		db.Debug().Create(&user)
