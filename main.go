@@ -425,6 +425,11 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	pid := r.FormValue("pid")
 
+	if len(pid) == 0 {
+		http.Redirect(w, r, "home", http.StatusTemporaryRedirect)
+		return
+	}
+
 	db, _ := gorm.Open(dbDriver, dbName)
 	defer db.Close()
 
