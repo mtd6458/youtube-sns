@@ -99,7 +99,10 @@ func page(fname string) *template.Template {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	page("index").Execute(w, nil)
+	err := page("index").Execute(w, nil)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -564,16 +567,28 @@ func PostEditHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(er)
 	}
 }
+
+// delete post handler
+func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
+	user := checkLogin(w, r)
+	if user == nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	pid := r.FormValue("pid")
 
 	switch r.Method {
 	case "POST":
-	  var post migration.Post
-	  db.Debug().Where("id = ?", pid).First(&post)
+		db, _ := gorm.Open(dbDriver, dbName)
+		defer db.Close()
 
-    if post.UserId == int(user.ID) {
-      db.Debug().Delete(migration.Post{}, "id = ?", pid)
-    }
+		var post migration.Post
+		db.Debug().Where("id = ?", pid).First(&post)
+
+		if post.UserId == int(user.ID) {
+			db.Debug().Delete(migration.Post{}, "id = ?", pid)
+		}
 	}
 
 	http.Redirect(w, r, "home", http.StatusTemporaryRedirect)
